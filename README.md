@@ -1,6 +1,6 @@
 # InnerTune
-
-<img src="https://raw.githubusercontent.com/z-huang/InnerTune/dev/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp" height="72">
+<div align="center">
+  <img src="https://raw.githubusercontent.com/z-huang/InnerTune/dev/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp" height="72" align="center">
 
 A Material 3 YouTube Music client for Android
 
@@ -13,6 +13,7 @@ A Material 3 YouTube Music client for Android
 [<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" height="80">](https://apt.izzysoft.de/fdroid/index/apk/com.zionhuang.music)
 
 [Compare versions](https://github.com/z-huang/InnerTune/wiki/App-Versions)
+</div>
 
 ## Features
 
