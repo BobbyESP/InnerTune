@@ -208,6 +208,7 @@ fun YouTubeSongMenu(
                     song.toMediaMetadata()
                 )
             )
+            playerConnection.player::seekToNext
             onDismiss()
         }
         GridMenuItem(
