@@ -40,6 +40,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.analytics.PlaybackStats
 import androidx.media3.exoplayer.analytics.PlaybackStatsListener
+import androidx.media3.exoplayer.audio.AudioSink
 import androidx.media3.exoplayer.audio.DefaultAudioSink
 import androidx.media3.exoplayer.audio.SilenceSkippingAudioProcessor
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
@@ -137,9 +138,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @AndroidEntryPoint
-class MusicService : MediaLibraryService(),
-    Player.Listener,
-    PlaybackStatsListener.Callback {
+class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListener.Callback {
     @Inject
     lateinit var database: MusicDatabase
 
@@ -185,27 +184,17 @@ class MusicService : MediaLibraryService(),
 
     override fun onCreate() {
         super.onCreate()
-        setMediaNotificationProvider(
-            DefaultMediaNotificationProvider(this, { NOTIFICATION_ID }, CHANNEL_ID, R.string.music_player)
-                .apply {
-                    setSmallIcon(R.drawable.small_icon)
-                }
-        )
-        player = ExoPlayer.Builder(this)
-            .setMediaSourceFactory(createMediaSourceFactory())
-            .setRenderersFactory(createRenderersFactory())
-            .setHandleAudioBecomingNoisy(true)
-            .setWakeMode(C.WAKE_MODE_NETWORK)
-            .setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setUsage(C.USAGE_MEDIA)
-                    .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
-                    .build(), true
-            )
-            .setSeekBackIncrementMs(5000)
-            .setSeekForwardIncrementMs(5000)
-            .build()
-            .apply {
+        setMediaNotificationProvider(DefaultMediaNotificationProvider(
+            this, { NOTIFICATION_ID }, CHANNEL_ID, R.string.music_player
+        ).apply {
+                setSmallIcon(R.drawable.small_icon)
+            })
+        player = ExoPlayer.Builder(this).setMediaSourceFactory(createMediaSourceFactory())
+            .setRenderersFactory(createRenderersFactory()).setHandleAudioBecomingNoisy(true)
+            .setWakeMode(C.WAKE_MODE_NETWORK).setAudioAttributes(
+                AudioAttributes.Builder().setUsage(C.USAGE_MEDIA)
+                    .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC).build(), true
+            ).setSeekBackIncrementMs(5000).setSeekForwardIncrementMs(5000).build().apply {
                 addListener(this@MusicService)
                 sleepTimer = SleepTimer(scope, this)
                 addListener(sleepTimer)
@@ -218,14 +207,9 @@ class MusicService : MediaLibraryService(),
         mediaSession = MediaLibrarySession.Builder(this, player, mediaLibrarySessionCallback)
             .setSessionActivity(
                 PendingIntent.getActivity(
-                    this,
-                    0,
-                    Intent(this, MainActivity::class.java),
-                    PendingIntent.FLAG_IMMUTABLE
+                    this, 0, Intent(this, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE
                 )
-            )
-            .setBitmapLoader(CoilBitmapLoader(this, scope))
-            .build()
+            ).setBitmapLoader(CoilBitmapLoader(this, scope)).build()
         player.repeatMode = dataStore.get(RepeatModeKey, REPEAT_MODE_OFF)
 
         // Keep a connected controller so that notification works
@@ -251,38 +235,33 @@ class MusicService : MediaLibraryService(),
             updateNotification()
         }
 
-        combine(
-            currentMediaMetadata.distinctUntilChangedBy { it?.id },
+        combine(currentMediaMetadata.distinctUntilChangedBy { it?.id },
             dataStore.data.map { it[ShowLyricsKey] ?: false }.distinctUntilChanged()
         ) { mediaMetadata, showLyrics ->
             mediaMetadata to showLyrics
         }.collectLatest(scope) { (mediaMetadata, showLyrics) ->
-            if (showLyrics && mediaMetadata != null && database.lyrics(mediaMetadata.id).first() == null) {
+            if (showLyrics && mediaMetadata != null && database.lyrics(mediaMetadata.id)
+                    .first() == null
+            ) {
                 val lyrics = lyricsHelper.getLyrics(mediaMetadata)
                 database.query {
                     upsert(
                         LyricsEntity(
-                            id = mediaMetadata.id,
-                            lyrics = lyrics
+                            id = mediaMetadata.id, lyrics = lyrics
                         )
                     )
                 }
             }
         }
 
-        dataStore.data
-            .map { it[SkipSilenceKey] ?: false }
-            .distinctUntilChanged()
+        dataStore.data.map { it[SkipSilenceKey] ?: false }.distinctUntilChanged()
             .collectLatest(scope) {
                 player.skipSilenceEnabled = it
             }
 
-        combine(
-            currentFormat,
-            dataStore.data
-                .map { it[AudioNormalizationKey] ?: true }
-                .distinctUntilChanged()
-        ) { format, normalizeAudio ->
+        combine(currentFormat,
+            dataStore.data.map { it[AudioNormalizationKey] ?: true }
+                .distinctUntilChanged()) { format, normalizeAudio ->
             format to normalizeAudio
         }.collectLatest(scope) { (format, normalizeAudio) ->
             normalizeFactor.value = if (normalizeAudio && format?.loudnessDb != null) {
@@ -306,8 +285,7 @@ class MusicService : MediaLibraryService(),
                         items = queue.items.map { it.toMediaItem() },
                         startIndex = queue.mediaItemIndex,
                         position = queue.position
-                    ),
-                    playWhenReady = false
+                    ), playWhenReady = false
                 )
             }
         }
@@ -329,22 +307,18 @@ class MusicService : MediaLibraryService(),
                 CommandButton.Builder()
                     .setDisplayName(getString(if (currentSong.value?.song?.inLibrary != null) R.string.remove_from_library else R.string.add_to_library))
                     .setIconResId(if (currentSong.value?.song?.inLibrary != null) R.drawable.library_add_check else R.drawable.library_add)
-                    .setSessionCommand(CommandToggleLibrary)
-                    .setEnabled(currentSong.value != null)
+                    .setSessionCommand(CommandToggleLibrary).setEnabled(currentSong.value != null)
                     .build(),
                 CommandButton.Builder()
                     .setDisplayName(getString(if (currentSong.value?.song?.liked == true) R.string.action_remove_like else R.string.action_like))
                     .setIconResId(if (currentSong.value?.song?.liked == true) R.drawable.favorite else R.drawable.favorite_border)
-                    .setSessionCommand(CommandToggleLike)
-                    .setEnabled(currentSong.value != null)
+                    .setSessionCommand(CommandToggleLike).setEnabled(currentSong.value != null)
                     .build(),
                 CommandButton.Builder()
                     .setDisplayName(getString(if (player.shuffleModeEnabled) R.string.action_shuffle_off else R.string.action_shuffle_on))
                     .setIconResId(if (player.shuffleModeEnabled) R.drawable.shuffle_on else R.drawable.shuffle)
-                    .setSessionCommand(CommandToggleShuffle)
-                    .build(),
-                CommandButton.Builder()
-                    .setDisplayName(
+                    .setSessionCommand(CommandToggleShuffle).build(),
+                CommandButton.Builder().setDisplayName(
                         getString(
                             when (player.repeatMode) {
                                 REPEAT_MODE_OFF -> R.string.repeat_mode_off
@@ -353,17 +327,14 @@ class MusicService : MediaLibraryService(),
                                 else -> throw IllegalStateException()
                             }
                         )
-                    )
-                    .setIconResId(
+                    ).setIconResId(
                         when (player.repeatMode) {
                             REPEAT_MODE_OFF -> R.drawable.repeat
                             REPEAT_MODE_ONE -> R.drawable.repeat_one_on
                             REPEAT_MODE_ALL -> R.drawable.repeat_on
                             else -> throw IllegalStateException()
                         }
-                    )
-                    .setSessionCommand(CommandToggleRepeatMode)
-                    .build()
+                    ).setSessionCommand(CommandToggleRepeatMode).build()
             )
         )
     }
@@ -373,28 +344,25 @@ class MusicService : MediaLibraryService(),
         val mediaMetadata = withContext(Dispatchers.Main) {
             player.findNextMediaItemById(mediaId)?.metadata
         } ?: return
-        val duration = song?.song?.duration?.takeIf { it != -1 }
-            ?: mediaMetadata.duration.takeIf { it != -1 }
-            ?: (playerResponse ?: YouTube.player(mediaId).getOrNull())?.videoDetails?.lengthSeconds?.toInt()
-            ?: -1
+        val duration =
+            song?.song?.duration?.takeIf { it != -1 } ?: mediaMetadata.duration.takeIf { it != -1 }
+            ?: (playerResponse ?: YouTube.player(mediaId)
+                .getOrNull())?.videoDetails?.lengthSeconds?.toInt() ?: -1
         database.query {
             if (song == null) insert(mediaMetadata.copy(duration = duration))
             else if (song.song.duration == -1) update(song.song.copy(duration = duration))
         }
         if (!database.hasRelatedSongs(mediaId)) {
-            val relatedEndpoint = YouTube.next(WatchEndpoint(videoId = mediaId)).getOrNull()?.relatedEndpoint ?: return
+            val relatedEndpoint =
+                YouTube.next(WatchEndpoint(videoId = mediaId)).getOrNull()?.relatedEndpoint
+                    ?: return
             val relatedPage = YouTube.related(relatedEndpoint).getOrNull() ?: return
             database.query {
-                relatedPage.songs
-                    .map(SongItem::toMediaMetadata)
-                    .onEach(::insert)
-                    .map {
+                relatedPage.songs.map(SongItem::toMediaMetadata).onEach(::insert).map {
                         RelatedSongMap(
-                            songId = mediaId,
-                            relatedSongId = it.id
+                            songId = mediaId, relatedSongId = it.id
                         )
-                    }
-                    .forEach(::insert)
+                    }.forEach(::insert)
             }
         }
     }
@@ -417,10 +385,20 @@ class MusicService : MediaLibraryService(),
             }
             if (initialStatus.items.isEmpty()) return@launch
             if (queue.preloadItem != null) {
-                player.addMediaItems(0, initialStatus.items.subList(0, initialStatus.mediaItemIndex))
-                player.addMediaItems(initialStatus.items.subList(initialStatus.mediaItemIndex + 1, initialStatus.items.size))
+                player.addMediaItems(
+                    0, initialStatus.items.subList(0, initialStatus.mediaItemIndex)
+                )
+                player.addMediaItems(
+                    initialStatus.items.subList(
+                        initialStatus.mediaItemIndex + 1, initialStatus.items.size
+                    )
+                )
             } else {
-                player.setMediaItems(initialStatus.items, if (initialStatus.mediaItemIndex > 0) initialStatus.mediaItemIndex else 0, initialStatus.position)
+                player.setMediaItems(
+                    initialStatus.items,
+                    if (initialStatus.mediaItemIndex > 0) initialStatus.mediaItemIndex else 0,
+                    initialStatus.position
+                )
                 player.prepare()
                 player.playWhenReady = playWhenReady
             }
@@ -429,10 +407,15 @@ class MusicService : MediaLibraryService(),
 
     fun startRadioSeamlessly() {
         val currentMediaMetadata = player.currentMetadata ?: return
-        if (player.currentMediaItemIndex > 0) player.removeMediaItems(0, player.currentMediaItemIndex)
-        if (player.currentMediaItemIndex < player.mediaItemCount - 1) player.removeMediaItems(player.currentMediaItemIndex + 1, player.mediaItemCount)
+        if (player.currentMediaItemIndex > 0) player.removeMediaItems(
+            0, player.currentMediaItemIndex
+        )
+        if (player.currentMediaItemIndex < player.mediaItemCount - 1) player.removeMediaItems(
+            player.currentMediaItemIndex + 1, player.mediaItemCount
+        )
         scope.launch(SilentHandler) {
-            val radioQueue = YouTubeQueue(endpoint = WatchEndpoint(videoId = currentMediaMetadata.id))
+            val radioQueue =
+                YouTubeQueue(endpoint = WatchEndpoint(videoId = currentMediaMetadata.id))
             val initialStatus = radioQueue.getInitialStatus()
             if (initialStatus.title != null) {
                 queueTitle = initialStatus.title
@@ -443,7 +426,9 @@ class MusicService : MediaLibraryService(),
     }
 
     fun playNext(items: List<MediaItem>) {
-        player.addMediaItems(if (player.mediaItemCount == 0) 0 else player.currentMediaItemIndex + 1, items)
+        player.addMediaItems(
+            if (player.mediaItemCount == 0) 0 else player.currentMediaItemIndex + 1, items
+        )
         player.prepare()
     }
 
@@ -469,30 +454,22 @@ class MusicService : MediaLibraryService(),
     }
 
     private fun openAudioEffectSession() {
-        sendBroadcast(
-            Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION).apply {
-                putExtra(AudioEffect.EXTRA_AUDIO_SESSION, player.audioSessionId)
-                putExtra(AudioEffect.EXTRA_PACKAGE_NAME, packageName)
-                putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
-            }
-        )
+        sendBroadcast(Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION).apply {
+            putExtra(AudioEffect.EXTRA_AUDIO_SESSION, player.audioSessionId)
+            putExtra(AudioEffect.EXTRA_PACKAGE_NAME, packageName)
+            putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
+        })
     }
 
     private fun closeAudioEffectSession() {
-        sendBroadcast(
-            Intent(AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION).apply {
-                putExtra(AudioEffect.EXTRA_AUDIO_SESSION, player.audioSessionId)
-            }
-        )
+        sendBroadcast(Intent(AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION).apply {
+            putExtra(AudioEffect.EXTRA_AUDIO_SESSION, player.audioSessionId)
+        })
     }
 
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
         // Auto load more songs
-        if (reason != Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT &&
-            player.playbackState != STATE_IDLE &&
-            player.mediaItemCount - player.currentMediaItemIndex <= 5 &&
-            currentQueue.hasNextPage()
-        ) {
+        if (reason != Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT && player.playbackState != STATE_IDLE && player.mediaItemCount - player.currentMediaItemIndex <= 5 && currentQueue.hasNextPage()) {
             scope.launch(SilentHandler) {
                 val mediaItems = currentQueue.nextPage()
                 if (player.playbackState != STATE_IDLE) {
@@ -511,7 +488,13 @@ class MusicService : MediaLibraryService(),
     }
 
     override fun onEvents(player: Player, events: Player.Events) {
-        if (events.containsAny(EVENT_PLAYBACK_STATE_CHANGED, EVENT_PLAY_WHEN_READY_CHANGED, EVENT_IS_PLAYING_CHANGED, EVENT_POSITION_DISCONTINUITY)) {
+        if (events.containsAny(
+                EVENT_PLAYBACK_STATE_CHANGED,
+                EVENT_PLAY_WHEN_READY_CHANGED,
+                EVENT_IS_PLAYING_CHANGED,
+                EVENT_POSITION_DISCONTINUITY
+            )
+        ) {
             if (player.playbackState != STATE_ENDED && player.playWhenReady) {
                 openAudioEffectSession()
             } else {
@@ -530,7 +513,8 @@ class MusicService : MediaLibraryService(),
             // Always put current playing item at first
             val shuffledIndices = IntArray(player.mediaItemCount) { it }
             shuffledIndices.shuffle()
-            shuffledIndices[shuffledIndices.indexOf(player.currentMediaItemIndex)] = shuffledIndices[0]
+            shuffledIndices[shuffledIndices.indexOf(player.currentMediaItemIndex)] =
+                shuffledIndices[0]
             shuffledIndices[0] = player.currentMediaItemIndex
             player.setShuffleOrder(DefaultShuffleOrder(shuffledIndices, System.currentTimeMillis()))
         }
@@ -546,32 +530,24 @@ class MusicService : MediaLibraryService(),
     }
 
     private fun createCacheDataSource(): CacheDataSource.Factory =
-        CacheDataSource.Factory()
-            .setCache(downloadCache)
-            .setUpstreamDataSourceFactory(
-                CacheDataSource.Factory()
-                    .setCache(playerCache)
-                    .setUpstreamDataSourceFactory(
+        CacheDataSource.Factory().setCache(downloadCache).setUpstreamDataSourceFactory(
+                CacheDataSource.Factory().setCache(playerCache).setUpstreamDataSourceFactory(
                         DefaultDataSource.Factory(
-                            this,
-                            OkHttpDataSource.Factory(
-                                OkHttpClient.Builder()
-                                    .proxy(YouTube.proxy)
-                                    .build()
+                            this, OkHttpDataSource.Factory(
+                                OkHttpClient.Builder().proxy(YouTube.proxy).build()
                             )
                         )
                     )
-            )
-            .setCacheWriteDataSinkFactory(null)
-            .setFlags(FLAG_IGNORE_CACHE_ON_ERROR)
+            ).setCacheWriteDataSinkFactory(null).setFlags(FLAG_IGNORE_CACHE_ON_ERROR)
 
     private fun createDataSourceFactory(): DataSource.Factory {
         val songUrlCache = HashMap<String, Pair<String, Long>>()
         return ResolvingDataSource.Factory(createCacheDataSource()) { dataSpec ->
             val mediaId = dataSpec.key ?: error("No media id")
 
-            if (downloadCache.isCached(mediaId, dataSpec.position, if (dataSpec.length >= 0) dataSpec.length else 1) ||
-                playerCache.isCached(mediaId, dataSpec.position, CHUNK_LENGTH)
+            if (downloadCache.isCached(
+                    mediaId, dataSpec.position, if (dataSpec.length >= 0) dataSpec.length else 1
+                ) || playerCache.isCached(mediaId, dataSpec.position, CHUNK_LENGTH)
             ) {
                 scope.launch(Dispatchers.IO) { recoverSong(mediaId) }
                 return@Factory dataSpec
@@ -590,37 +566,52 @@ class MusicService : MediaLibraryService(),
             }.getOrElse { throwable ->
                 when (throwable) {
                     is ConnectException, is UnknownHostException -> {
-                        throw PlaybackException(getString(R.string.error_no_internet), throwable, PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED)
+                        throw PlaybackException(
+                            getString(R.string.error_no_internet),
+                            throwable,
+                            PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED
+                        )
                     }
 
                     is SocketTimeoutException -> {
-                        throw PlaybackException(getString(R.string.error_timeout), throwable, PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT)
+                        throw PlaybackException(
+                            getString(R.string.error_timeout),
+                            throwable,
+                            PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT
+                        )
                     }
 
-                    else -> throw PlaybackException(getString(R.string.error_unknown), throwable, PlaybackException.ERROR_CODE_REMOTE_ERROR)
+                    else -> throw PlaybackException(
+                        getString(R.string.error_unknown),
+                        throwable,
+                        PlaybackException.ERROR_CODE_REMOTE_ERROR
+                    )
                 }
             }
             if (playerResponse.playabilityStatus.status != "OK") {
-                throw PlaybackException(playerResponse.playabilityStatus.reason, null, PlaybackException.ERROR_CODE_REMOTE_ERROR)
+                throw PlaybackException(
+                    playerResponse.playabilityStatus.reason,
+                    null,
+                    PlaybackException.ERROR_CODE_REMOTE_ERROR
+                )
             }
 
-            val format =
-                if (playedFormat != null) {
-                    playerResponse.streamingData?.adaptiveFormats?.find {
-                        // Use itag to identify previously played format
-                        it.itag == playedFormat.itag
+            val format = if (playedFormat != null) {
+                playerResponse.streamingData?.adaptiveFormats?.find {
+                    // Use itag to identify previously played format
+                    it.itag == playedFormat.itag
+                }
+            } else {
+                playerResponse.streamingData?.adaptiveFormats?.filter { it.isAudio }?.maxByOrNull {
+                        it.bitrate * when (audioQuality) {
+                            AudioQuality.AUTO -> if (connectivityManager.isActiveNetworkMetered) -1 else 1
+                            AudioQuality.HIGH -> 1
+                            AudioQuality.LOW -> -1
+                        } + (if (it.mimeType.startsWith("audio/webm")) 10240 else 0) // prefer opus stream
                     }
-                } else {
-                    playerResponse.streamingData?.adaptiveFormats
-                        ?.filter { it.isAudio }
-                        ?.maxByOrNull {
-                            it.bitrate * when (audioQuality) {
-                                AudioQuality.AUTO -> if (connectivityManager.isActiveNetworkMetered) -1 else 1
-                                AudioQuality.HIGH -> 1
-                                AudioQuality.LOW -> -1
-                            } + (if (it.mimeType.startsWith("audio/webm")) 10240 else 0) // prefer opus stream
-                        }
-                } ?: throw PlaybackException(getString(R.string.error_no_stream), null, ERROR_CODE_NO_STREAM)
+            } ?: throw PlaybackException(
+                getString(R.string.error_no_stream), null, ERROR_CODE_NO_STREAM
+            )
 
             database.query {
                 upsert(
@@ -638,39 +629,45 @@ class MusicService : MediaLibraryService(),
             }
             scope.launch(Dispatchers.IO) { recoverSong(mediaId, playerResponse) }
 
-            songUrlCache[mediaId] = format.url!! to playerResponse.streamingData!!.expiresInSeconds * 1000L
-            dataSpec.withUri(format.url!!.toUri()).subrange(dataSpec.uriPositionOffset, CHUNK_LENGTH)
+            songUrlCache[mediaId] =
+                format.url!! to playerResponse.streamingData!!.expiresInSeconds * 1000L
+            dataSpec.withUri(format.url!!.toUri())
+                .subrange(dataSpec.uriPositionOffset, CHUNK_LENGTH)
         }
     }
 
     private fun createMediaSourceFactory() =
-        DefaultMediaSourceFactory(
-            createDataSourceFactory(),
-            ExtractorsFactory {
-                arrayOf(MatroskaExtractor(), FragmentedMp4Extractor())
-            }
-        )
+        DefaultMediaSourceFactory(createDataSourceFactory(), ExtractorsFactory {
+            arrayOf(MatroskaExtractor(), FragmentedMp4Extractor())
+        })
 
-    private fun createRenderersFactory() =
-        object : DefaultRenderersFactory(this) {
-            override fun buildAudioSink(context: Context, enableFloatOutput: Boolean, enableAudioTrackPlaybackParams: Boolean, enableOffload: Boolean) =
-                DefaultAudioSink.Builder(this@MusicService)
-                    .setEnableFloatOutput(enableFloatOutput)
-                    .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
-                    .setOffloadMode(if (enableOffload) DefaultAudioSink.OFFLOAD_MODE_ENABLED_GAPLESS_REQUIRED else DefaultAudioSink.OFFLOAD_MODE_DISABLED)
-                    .setAudioProcessorChain(
-                        DefaultAudioSink.DefaultAudioProcessorChain(
-                            emptyArray(),
-                            SilenceSkippingAudioProcessor(2_000_000, 20_000, 256),
-                            SonicAudioProcessor()
-                        )
+    private fun createRenderersFactory() = object : DefaultRenderersFactory(this) {
+        override fun buildAudioSink(
+            context: Context, enableFloatOutput: Boolean, enableAudioTrackPlaybackParams: Boolean
+        ): AudioSink {
+            return DefaultAudioSink.Builder(this@MusicService).setEnableFloatOutput(enableFloatOutput)
+
+                .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
+                .setAudioProcessorChain(
+                    DefaultAudioSink.DefaultAudioProcessorChain(
+                        emptyArray(),
+                        SilenceSkippingAudioProcessor(2_000_000, 20_000, 256),
+                        SonicAudioProcessor()
                     )
-                    .build()
+                )
+                .build()
         }
+    }
 
-    override fun onPlaybackStatsReady(eventTime: AnalyticsListener.EventTime, playbackStats: PlaybackStats) {
-        val mediaItem = eventTime.timeline.getWindow(eventTime.windowIndex, Timeline.Window()).mediaItem
-        if (playbackStats.totalPlayTimeMs >= 30000 && !dataStore.get(PauseListenHistoryKey, false)) {
+    override fun onPlaybackStatsReady(
+        eventTime: AnalyticsListener.EventTime, playbackStats: PlaybackStats
+    ) {
+        val mediaItem =
+            eventTime.timeline.getWindow(eventTime.windowIndex, Timeline.Window()).mediaItem
+        if (playbackStats.totalPlayTimeMs >= 30000 && !dataStore.get(
+                PauseListenHistoryKey, false
+            )
+        ) {
             database.query {
                 incrementTotalPlayTime(mediaItem.mediaId, playbackStats.totalPlayTimeMs)
                 try {

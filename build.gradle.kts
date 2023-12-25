@@ -1,8 +1,3 @@
-plugins {
-    id("com.google.dagger.hilt.android").version("2.44").apply(false)
-    id("com.google.devtools.ksp").version("1.8.0-1.0.9").apply(false)
-}
-
 buildscript {
     val isFullBuild by extra {
         gradle.startParameter.taskNames.none { task -> task.contains("foss", ignoreCase = true) }
@@ -22,6 +17,18 @@ buildscript {
             classpath(libs.firebase.perf.plugin)
         }
     }
+}
+
+plugins {
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.hilt) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.kotlin.ksp) apply false
+    alias(libs.plugins.androidLibrary) apply false
+    alias(libs.plugins.google.gms) apply false
+    alias(libs.plugins.androidTest) apply false
+    alias(libs.plugins.androidx.baselineprofile) apply false
 }
 
 tasks.register<Delete>("Clean") {

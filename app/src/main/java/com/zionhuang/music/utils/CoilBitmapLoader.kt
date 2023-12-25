@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException
 class CoilBitmapLoader(
     private val context: Context,
     private val scope: CoroutineScope,
-) : BitmapLoader {
+) : androidx.media3.common.util.BitmapLoader {
     override fun decodeBitmap(data: ByteArray): ListenableFuture<Bitmap> =
         scope.future(Dispatchers.IO) {
             BitmapFactory.decodeByteArray(data, 0, data.size) ?: error("Could not decode image data")
@@ -41,4 +41,8 @@ class CoilBitmapLoader(
                 throw ExecutionException(e)
             }
         }
+
+    override fun loadBitmap(uri: Uri, options: BitmapFactory.Options?): ListenableFuture<Bitmap> {
+        return loadBitmap(uri)
+    }
 }

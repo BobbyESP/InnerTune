@@ -3,11 +3,11 @@
 val isFullBuild: Boolean by rootProject.extra
 
 plugins {
-    id("com.android.application")
-    kotlin("android")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.kotlin.ksp)
     kotlin("kapt")
-    id("com.google.dagger.hilt.android")
-    id("com.google.devtools.ksp")
 }
 
 if (isFullBuild && System.getenv("PULL_REQUEST") == null) {
@@ -18,12 +18,12 @@ if (isFullBuild && System.getenv("PULL_REQUEST") == null) {
 
 android {
     namespace = "com.zionhuang.music"
-    compileSdk = 33
-    buildToolsVersion = "30.0.3"
+    compileSdk = 34
+
     defaultConfig {
         applicationId = "com.zionhuang.music"
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 19
         versionName = "0.5.3"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -57,6 +57,9 @@ android {
             }
         }
     }
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
+    }
     buildFeatures {
         compose = true
     }
@@ -83,11 +86,6 @@ android {
         disable += "MissingTranslation"
     }
 }
-
-ksp {
-    arg("room.schemaLocation", "$projectDir/schemas")
-}
-
 dependencies {
     implementation(libs.guava)
     implementation(libs.coroutines.guava)
@@ -125,14 +123,13 @@ dependencies {
     implementation(libs.media3.okhttp)
 
     implementation(libs.room.runtime)
-    annotationProcessor(libs.room.compiler)
-    ksp(libs.room.compiler)
     implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 
     implementation(libs.apache.lang3)
 
     implementation(libs.hilt)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
     implementation(projects.innertube)
     implementation(projects.kugou)

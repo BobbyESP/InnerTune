@@ -14,6 +14,8 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastSumBy
+import kotlin.math.abs
+import kotlin.math.sign
 
 @ExperimentalFoundationApi
 fun SnapLayoutInfoProvider(
@@ -28,27 +30,22 @@ fun SnapLayoutInfoProvider(
     // Single page snapping is the default
     override fun Density.calculateApproachOffset(initialVelocity: Float): Float = 0f
 
-    override fun Density.calculateSnappingOffsetBounds(): ClosedFloatingPointRange<Float> {
-        var lowerBoundOffset = Float.NEGATIVE_INFINITY
-        var upperBoundOffset = Float.POSITIVE_INFINITY
+    override fun Density.calculateSnappingOffset(currentVelocity: Float): Float {
+        var closestItemOffset = Float.MAX_VALUE
 
         layoutInfo.visibleItemsInfo.fastForEach { item ->
-            val offset =
-                calculateDistanceToDesiredSnapPosition(layoutInfo, item, positionInLayout)
+            val offset = calculateDistanceToDesiredSnapPosition(layoutInfo, item, positionInLayout)
 
-            // Find item that is closest to the center
-            if (offset <= 0 && offset > lowerBoundOffset) {
-                lowerBoundOffset = offset
-            }
-
-            // Find item that is closest to center, but after it
-            if (offset >= 0 && offset < upperBoundOffset) {
-                upperBoundOffset = offset
+            // Check if the item is closer to the center than the current closest item
+            if (abs(offset) < abs(closestItemOffset)) {
+                closestItemOffset = offset
             }
         }
 
-        return lowerBoundOffset.rangeTo(upperBoundOffset)
+        // Adjust the offset based on the velocity
+        return closestItemOffset + currentVelocity
     }
+
 
     override fun Density.calculateSnapStepSize(): Float = with(layoutInfo) {
         if (visibleItemsInfo.isNotEmpty()) {
@@ -61,37 +58,28 @@ fun SnapLayoutInfoProvider(
 
 @ExperimentalFoundationApi
 fun SnapLayoutInfoProvider(
-    pagerState: PagerState,
+    layoutInfo: LazyListLayoutInfo,
     positionInLayout: Density.(layoutSize: Float, itemSize: Float) -> Float =
         { layoutSize, itemSize -> (layoutSize / 2f - itemSize / 2f) },
 ): SnapLayoutInfoProvider = object : SnapLayoutInfoProvider {
 
-    private val layoutInfo: LazyListLayoutInfo
-        get() = pagerState.layoutInfo
-
     // Single page snapping is the default
     override fun Density.calculateApproachOffset(initialVelocity: Float): Float = 0f
 
-    override fun Density.calculateSnappingOffsetBounds(): ClosedFloatingPointRange<Float> {
-        var lowerBoundOffset = Float.NEGATIVE_INFINITY
-        var upperBoundOffset = Float.POSITIVE_INFINITY
+    override fun Density.calculateSnappingOffset(currentVelocity: Float): Float {
+        var closestItemOffset = Float.MAX_VALUE
 
         layoutInfo.visibleItemsInfo.fastForEach { item ->
-            val offset =
-                calculateDistanceToDesiredSnapPosition(layoutInfo, item, positionInLayout)
+            val offset = calculateDistanceToDesiredSnapPosition(layoutInfo, item, positionInLayout)
 
-            // Find item that is closest to the center
-            if (offset <= 0 && offset > lowerBoundOffset) {
-                lowerBoundOffset = offset
-            }
-
-            // Find item that is closest to center, but after it
-            if (offset >= 0 && offset < upperBoundOffset) {
-                upperBoundOffset = offset
+            // Check if the item is closer to the center than the current closest item
+            if (abs(offset) < abs(closestItemOffset)) {
+                closestItemOffset = offset
             }
         }
 
-        return lowerBoundOffset.rangeTo(upperBoundOffset)
+        // Adjust the offset based on the velocity
+        return closestItemOffset + currentVelocity
     }
 
     override fun Density.calculateSnapStepSize(): Float = with(layoutInfo) {

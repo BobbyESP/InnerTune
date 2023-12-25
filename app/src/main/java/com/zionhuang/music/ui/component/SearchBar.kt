@@ -247,7 +247,7 @@ private fun SearchBarInputField(
     val searchSemantics = getString(Strings.SearchBarSearch)
     val suggestionsAvailableSemantics = getString(Strings.SuggestionsAvailable)
     val textColor = LocalTextStyle.current.color.takeOrElse {
-        colors.textColor(enabled).value
+        colors.textColor(enabled = enabled, interactionSource = interactionSource, isError = false).value
     }
 
     Row(
@@ -306,7 +306,7 @@ private fun SearchBarInputField(
                     if (placeholder != null && query.text.isEmpty()) {
                         Box(Modifier.alpha(0.8f)) {
                             Decoration(
-                                contentColor = colors.placeholderColor(enabled).value,
+                                contentColor = colors.placeholderColor(enabled = enabled, interactionSource = interactionSource, isError = false).value,
                                 typography = MaterialTheme.typography.bodyLarge,
                                 content = placeholder
                             )
