@@ -56,7 +56,11 @@ fun LoginScreen(
         factory = { context ->
             WebView(context).apply {
                 webViewClient = object : WebViewClient() {
-                    override fun doUpdateVisitedHistory(view: WebView, url: String, isReload: Boolean) {
+                    override fun doUpdateVisitedHistory(
+                        view: WebView,
+                        url: String,
+                        isReload: Boolean
+                    ) {
                         if (url.startsWith("https://music.youtube.com")) {
                             innerTubeCookie = CookieManager.getInstance().getCookie(url)
                             GlobalScope.launch {

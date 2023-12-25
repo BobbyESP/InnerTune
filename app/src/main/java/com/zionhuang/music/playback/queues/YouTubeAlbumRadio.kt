@@ -24,7 +24,10 @@ class YouTubeAlbumRadio(
         continuation = nextResult.continuation
         Queue.Status(
             title = nextResult.title,
-            items = (albumSongs + nextResult.items.subList(albumSongs.size, nextResult.items.size)).map { it.toMediaItem() },
+            items = (albumSongs + nextResult.items.subList(
+                albumSongs.size,
+                nextResult.items.size
+            )).map { it.toMediaItem() },
             mediaItemIndex = nextResult.currentIndex ?: 0
         )
     }

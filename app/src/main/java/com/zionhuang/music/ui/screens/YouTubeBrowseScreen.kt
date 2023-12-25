@@ -130,7 +130,13 @@ fun YouTubeBrowseScreen(
                                     if (item.id == mediaMetadata?.id) {
                                         playerConnection.player.togglePlayPause()
                                     } else {
-                                        playerConnection.playQueue(YouTubeQueue(WatchEndpoint(videoId = item.id), item.toMediaMetadata()))
+                                        playerConnection.playQueue(
+                                            YouTubeQueue(
+                                                WatchEndpoint(
+                                                    videoId = item.id
+                                                ), item.toMediaMetadata()
+                                            )
+                                        )
                                     }
                                 }
 

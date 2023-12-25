@@ -80,9 +80,11 @@ fun PlayerMenu(
     val database = LocalDatabase.current
     val playerConnection = LocalPlayerConnection.current ?: return
     val playerVolume = playerConnection.service.playerVolume.collectAsState()
-    val activityResultLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { }
+    val activityResultLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { }
 
-    val download by LocalDownloadUtil.current.getDownload(mediaMetadata.id).collectAsState(initial = null)
+    val download by LocalDownloadUtil.current.getDownload(mediaMetadata.id)
+        .collectAsState(initial = null)
 
     var showChoosePlaylistDialog by rememberSaveable {
         mutableStateOf(false)
@@ -199,10 +201,11 @@ fun PlayerMenu(
                 database.transaction {
                     insert(mediaMetadata)
                 }
-                val downloadRequest = DownloadRequest.Builder(mediaMetadata.id, mediaMetadata.id.toUri())
-                    .setCustomCacheKey(mediaMetadata.id)
-                    .setData(mediaMetadata.title.toByteArray())
-                    .build()
+                val downloadRequest =
+                    DownloadRequest.Builder(mediaMetadata.id, mediaMetadata.id.toUri())
+                        .setCustomCacheKey(mediaMetadata.id)
+                        .setData(mediaMetadata.title.toByteArray())
+                        .build()
                 DownloadService.sendAddDownload(
                     context,
                     ExoDownloadService::class.java,
@@ -295,7 +298,8 @@ fun PitchTempoDialog(
         mutableStateOf(round(12 * log2(playerConnection.player.playbackParameters.pitch)).toInt())
     }
     val updatePlaybackParameters = {
-        playerConnection.player.playbackParameters = PlaybackParameters(tempo, 2f.pow(transposeValue.toFloat() / 12))
+        playerConnection.player.playbackParameters =
+            PlaybackParameters(tempo, 2f.pow(transposeValue.toFloat() / 12))
     }
 
     AlertDialog(

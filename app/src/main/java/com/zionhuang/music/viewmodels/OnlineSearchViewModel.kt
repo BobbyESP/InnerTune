@@ -34,9 +34,10 @@ class OnlineSearchViewModel @Inject constructor(
                     }
                 } else {
                     if (viewStateMap[filter.value] == null) {
-                        viewStateMap[filter.value] = YouTube.search(query, filter).getOrNull()?.let { result ->
-                            ItemsPage(result.items.distinctBy { it.id }, result.continuation)
-                        }
+                        viewStateMap[filter.value] =
+                            YouTube.search(query, filter).getOrNull()?.let { result ->
+                                ItemsPage(result.items.distinctBy { it.id }, result.continuation)
+                            }
                     }
                 }
             }
@@ -50,8 +51,12 @@ class OnlineSearchViewModel @Inject constructor(
             val viewState = viewStateMap[filter] ?: return@launch
             val continuation = viewState.continuation
             if (continuation != null) {
-                val searchResult = YouTube.searchContinuation(continuation).getOrNull() ?: return@launch
-                viewStateMap[filter] = ItemsPage((viewState.items + searchResult.items).distinctBy { it.id }, searchResult.continuation)
+                val searchResult =
+                    YouTube.searchContinuation(continuation).getOrNull() ?: return@launch
+                viewStateMap[filter] = ItemsPage(
+                    (viewState.items + searchResult.items).distinctBy { it.id },
+                    searchResult.continuation
+                )
             }
         }
     }

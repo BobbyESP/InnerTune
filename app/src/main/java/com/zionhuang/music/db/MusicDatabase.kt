@@ -3,17 +3,39 @@ package com.zionhuang.music.db
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import androidx.core.content.contentValuesOf
-import androidx.room.*
+import androidx.room.AutoMigration
+import androidx.room.Database
+import androidx.room.DeleteColumn
+import androidx.room.DeleteTable
+import androidx.room.RenameColumn
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
-import com.zionhuang.music.db.entities.*
+import com.zionhuang.music.db.entities.AlbumArtistMap
+import com.zionhuang.music.db.entities.AlbumEntity
+import com.zionhuang.music.db.entities.ArtistEntity
+import com.zionhuang.music.db.entities.Event
+import com.zionhuang.music.db.entities.FormatEntity
+import com.zionhuang.music.db.entities.LyricsEntity
+import com.zionhuang.music.db.entities.PlaylistEntity
+import com.zionhuang.music.db.entities.PlaylistSongMap
+import com.zionhuang.music.db.entities.PlaylistSongMapPreview
+import com.zionhuang.music.db.entities.RelatedSongMap
+import com.zionhuang.music.db.entities.SearchHistory
+import com.zionhuang.music.db.entities.SongAlbumMap
+import com.zionhuang.music.db.entities.SongArtistMap
+import com.zionhuang.music.db.entities.SongEntity
+import com.zionhuang.music.db.entities.SortedSongAlbumMap
+import com.zionhuang.music.db.entities.SortedSongArtistMap
 import com.zionhuang.music.extensions.toSQLiteQuery
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.*
+import java.util.Date
 
 class MusicDatabase(
     private val delegate: InternalDatabase,
@@ -170,8 +192,10 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
                         title = cursor.getString(1),
                         duration = cursor.getInt(3),
                         liked = cursor.getInt(4) == 1,
-                        createDate = Instant.ofEpochMilli(Date(cursor.getLong(8)).time).atZone(ZoneOffset.UTC).toLocalDateTime(),
-                        modifyDate = Instant.ofEpochMilli(Date(cursor.getLong(9)).time).atZone(ZoneOffset.UTC).toLocalDateTime()
+                        createDate = Instant.ofEpochMilli(Date(cursor.getLong(8)).time)
+                            .atZone(ZoneOffset.UTC).toLocalDateTime(),
+                        modifyDate = Instant.ofEpochMilli(Date(cursor.getLong(9)).time)
+                            .atZone(ZoneOffset.UTC).toLocalDateTime()
                     )
                 )
                 songArtistMaps.add(
@@ -274,7 +298,11 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
     DeleteColumn(tableName = "playlist", columnName = "lastUpdateTime")
 )
 @RenameColumn.Entries(
-    RenameColumn(tableName = "song", fromColumnName = "download_state", toColumnName = "downloadState"),
+    RenameColumn(
+        tableName = "song",
+        fromColumnName = "download_state",
+        toColumnName = "downloadState"
+    ),
     RenameColumn(tableName = "song", fromColumnName = "create_date", toColumnName = "createDate"),
     RenameColumn(tableName = "song", fromColumnName = "modify_date", toColumnName = "modifyDate")
 )
@@ -282,7 +310,13 @@ class Migration5To6 : AutoMigrationSpec {
     override fun onPostMigrate(db: SupportSQLiteDatabase) {
         db.query("SELECT id FROM playlist WHERE id NOT LIKE 'LP%'").use { cursor ->
             while (cursor.moveToNext()) {
-                db.execSQL("UPDATE playlist SET browseID = '${cursor.getString(0)}' WHERE id = '${cursor.getString(0)}'")
+                db.execSQL(
+                    "UPDATE playlist SET browseID = '${cursor.getString(0)}' WHERE id = '${
+                        cursor.getString(
+                            0
+                        )
+                    }'"
+                )
             }
         }
     }
@@ -292,7 +326,13 @@ class Migration6To7 : AutoMigrationSpec {
     override fun onPostMigrate(db: SupportSQLiteDatabase) {
         db.query("SELECT id, createDate FROM song").use { cursor ->
             while (cursor.moveToNext()) {
-                db.execSQL("UPDATE song SET inLibrary = ${cursor.getLong(1)} WHERE id = '${cursor.getString(0)}'")
+                db.execSQL(
+                    "UPDATE song SET inLibrary = ${cursor.getLong(1)} WHERE id = '${
+                        cursor.getString(
+                            0
+                        )
+                    }'"
+                )
             }
         }
     }

@@ -161,9 +161,10 @@ fun OnlinePlaylistScreen(
                                             }
                                         }
                                         ClickableText(annotatedString) { offset ->
-                                            annotatedString.getStringAnnotations(offset, offset).firstOrNull()?.let { range ->
-                                                navController.navigate("artist/${range.tag}")
-                                            }
+                                            annotatedString.getStringAnnotations(offset, offset)
+                                                .firstOrNull()?.let { range ->
+                                                    navController.navigate("artist/${range.tag}")
+                                                }
                                         }
                                     }
 
@@ -195,7 +196,11 @@ fun OnlinePlaylistScreen(
                                                         }
                                                         .forEach(::insert)
                                                     coroutineScope.launch {
-                                                        snackbarHostState.showSnackbar(context.getString(R.string.playlist_imported))
+                                                        snackbarHostState.showSnackbar(
+                                                            context.getString(
+                                                                R.string.playlist_imported
+                                                            )
+                                                        )
                                                     }
                                                 }
                                             }
@@ -295,7 +300,12 @@ fun OnlinePlaylistScreen(
                                     if (song.id == mediaMetadata?.id) {
                                         playerConnection.player.togglePlayPause()
                                     } else {
-                                        playerConnection.playQueue(YouTubeQueue(song.endpoint ?: WatchEndpoint(videoId = song.id), song.toMediaMetadata()))
+                                        playerConnection.playQueue(
+                                            YouTubeQueue(
+                                                song.endpoint ?: WatchEndpoint(videoId = song.id),
+                                                song.toMediaMetadata()
+                                            )
+                                        )
                                     }
                                 }
                                 .animateItemPlacement()

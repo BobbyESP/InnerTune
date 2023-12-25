@@ -111,7 +111,8 @@ fun BottomSheetPlayer(
     }
 
     val queueSheetState = rememberBottomSheetState(
-        dismissedBound = QueuePeekHeight + WindowInsets.systemBars.asPaddingValues().calculateBottomPadding(),
+        dismissedBound = QueuePeekHeight + WindowInsets.systemBars.asPaddingValues()
+            .calculateBottomPadding(),
         expandedBound = state.expandedBound,
     )
 

@@ -119,7 +119,10 @@ fun Lyrics(
             delay(50)
             val sliderPosition = sliderPositionProvider()
             isSeeking = sliderPosition != null
-            currentLineIndex = findCurrentLineIndex(lines, sliderPosition ?: playerConnection.player.currentPosition)
+            currentLineIndex = findCurrentLineIndex(
+                lines,
+                sliderPosition ?: playerConnection.player.currentPosition
+            )
         }
     }
 
@@ -140,9 +143,13 @@ fun Lyrics(
             deferredCurrentLineIndex = currentLineIndex
             if (lastPreviewTime == 0L) {
                 if (isSeeking) {
-                    lazyListState.scrollToItem(currentLineIndex, with(density) { 36.dp.toPx().toInt() })
+                    lazyListState.scrollToItem(
+                        currentLineIndex,
+                        with(density) { 36.dp.toPx().toInt() })
                 } else {
-                    lazyListState.animateScrollToItem(currentLineIndex, with(density) { 36.dp.toPx().toInt() })
+                    lazyListState.animateScrollToItem(
+                        currentLineIndex,
+                        with(density) { 36.dp.toPx().toInt() })
                 }
             }
         }
@@ -164,19 +171,27 @@ fun Lyrics(
                 .fadingEdge(vertical = 64.dp)
                 .nestedScroll(remember {
                     object : NestedScrollConnection {
-                        override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
+                        override fun onPostScroll(
+                            consumed: Offset,
+                            available: Offset,
+                            source: NestedScrollSource
+                        ): Offset {
                             lastPreviewTime = System.currentTimeMillis()
                             return super.onPostScroll(consumed, available, source)
                         }
 
-                        override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                        override suspend fun onPostFling(
+                            consumed: Velocity,
+                            available: Velocity
+                        ): Velocity {
                             lastPreviewTime = System.currentTimeMillis()
                             return super.onPostFling(consumed, available)
                         }
                     }
                 })
         ) {
-            val displayedCurrentLineIndex = if (isSeeking) deferredCurrentLineIndex else currentLineIndex
+            val displayedCurrentLineIndex =
+                if (isSeeking) deferredCurrentLineIndex else currentLineIndex
 
             if (lyrics == null || translating) {
                 item {

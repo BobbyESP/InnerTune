@@ -11,9 +11,9 @@ sealed class Screens(
     @DrawableRes val iconId: Int,
     val route: String,
 ) {
-    object Home : Screens(R.string.home, R.drawable.home, "home")
-    object Songs : Screens(R.string.songs, R.drawable.music_note, "songs")
-    object Artists : Screens(R.string.artists, R.drawable.artist, "artists")
-    object Albums : Screens(R.string.albums, R.drawable.album, "albums")
-    object Playlists : Screens(R.string.playlists, R.drawable.queue_music, "playlists")
+    data object Home : Screens(R.string.home, R.drawable.home, "home")
+    data object Songs : Screens(R.string.songs, R.drawable.music_note, "songs")
+    data object Artists : Screens(R.string.artists, R.drawable.artist, "artists")
+    data object Albums : Screens(R.string.albums, R.drawable.album, "albums")
+    data object Playlists : Screens(R.string.playlists, R.drawable.queue_music, "playlists")
 }

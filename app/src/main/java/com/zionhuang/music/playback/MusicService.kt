@@ -187,8 +187,8 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
         setMediaNotificationProvider(DefaultMediaNotificationProvider(
             this, { NOTIFICATION_ID }, CHANNEL_ID, R.string.music_player
         ).apply {
-                setSmallIcon(R.drawable.small_icon)
-            })
+            setSmallIcon(R.drawable.small_icon)
+        })
         player = ExoPlayer.Builder(this).setMediaSourceFactory(createMediaSourceFactory())
             .setRenderersFactory(createRenderersFactory()).setHandleAudioBecomingNoisy(true)
             .setWakeMode(C.WAKE_MODE_NETWORK).setAudioAttributes(
@@ -235,7 +235,8 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
             updateNotification()
         }
 
-        combine(currentMediaMetadata.distinctUntilChangedBy { it?.id },
+        combine(
+            currentMediaMetadata.distinctUntilChangedBy { it?.id },
             dataStore.data.map { it[ShowLyricsKey] ?: false }.distinctUntilChanged()
         ) { mediaMetadata, showLyrics ->
             mediaMetadata to showLyrics
@@ -319,22 +320,22 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
                     .setIconResId(if (player.shuffleModeEnabled) R.drawable.shuffle_on else R.drawable.shuffle)
                     .setSessionCommand(CommandToggleShuffle).build(),
                 CommandButton.Builder().setDisplayName(
-                        getString(
-                            when (player.repeatMode) {
-                                REPEAT_MODE_OFF -> R.string.repeat_mode_off
-                                REPEAT_MODE_ONE -> R.string.repeat_mode_one
-                                REPEAT_MODE_ALL -> R.string.repeat_mode_all
-                                else -> throw IllegalStateException()
-                            }
-                        )
-                    ).setIconResId(
+                    getString(
                         when (player.repeatMode) {
-                            REPEAT_MODE_OFF -> R.drawable.repeat
-                            REPEAT_MODE_ONE -> R.drawable.repeat_one_on
-                            REPEAT_MODE_ALL -> R.drawable.repeat_on
+                            REPEAT_MODE_OFF -> R.string.repeat_mode_off
+                            REPEAT_MODE_ONE -> R.string.repeat_mode_one
+                            REPEAT_MODE_ALL -> R.string.repeat_mode_all
                             else -> throw IllegalStateException()
                         }
-                    ).setSessionCommand(CommandToggleRepeatMode).build()
+                    )
+                ).setIconResId(
+                    when (player.repeatMode) {
+                        REPEAT_MODE_OFF -> R.drawable.repeat
+                        REPEAT_MODE_ONE -> R.drawable.repeat_one_on
+                        REPEAT_MODE_ALL -> R.drawable.repeat_on
+                        else -> throw IllegalStateException()
+                    }
+                ).setSessionCommand(CommandToggleRepeatMode).build()
             )
         )
     }
@@ -359,10 +360,10 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
             val relatedPage = YouTube.related(relatedEndpoint).getOrNull() ?: return
             database.query {
                 relatedPage.songs.map(SongItem::toMediaMetadata).onEach(::insert).map {
-                        RelatedSongMap(
-                            songId = mediaId, relatedSongId = it.id
-                        )
-                    }.forEach(::insert)
+                    RelatedSongMap(
+                        songId = mediaId, relatedSongId = it.id
+                    )
+                }.forEach(::insert)
             }
         }
     }
@@ -531,14 +532,14 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
 
     private fun createCacheDataSource(): CacheDataSource.Factory =
         CacheDataSource.Factory().setCache(downloadCache).setUpstreamDataSourceFactory(
-                CacheDataSource.Factory().setCache(playerCache).setUpstreamDataSourceFactory(
-                        DefaultDataSource.Factory(
-                            this, OkHttpDataSource.Factory(
-                                OkHttpClient.Builder().proxy(YouTube.proxy).build()
-                            )
-                        )
+            CacheDataSource.Factory().setCache(playerCache).setUpstreamDataSourceFactory(
+                DefaultDataSource.Factory(
+                    this, OkHttpDataSource.Factory(
+                        OkHttpClient.Builder().proxy(YouTube.proxy).build()
                     )
-            ).setCacheWriteDataSinkFactory(null).setFlags(FLAG_IGNORE_CACHE_ON_ERROR)
+                )
+            )
+        ).setCacheWriteDataSinkFactory(null).setFlags(FLAG_IGNORE_CACHE_ON_ERROR)
 
     private fun createDataSourceFactory(): DataSource.Factory {
         val songUrlCache = HashMap<String, Pair<String, Long>>()
@@ -603,12 +604,12 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
                 }
             } else {
                 playerResponse.streamingData?.adaptiveFormats?.filter { it.isAudio }?.maxByOrNull {
-                        it.bitrate * when (audioQuality) {
-                            AudioQuality.AUTO -> if (connectivityManager.isActiveNetworkMetered) -1 else 1
-                            AudioQuality.HIGH -> 1
-                            AudioQuality.LOW -> -1
-                        } + (if (it.mimeType.startsWith("audio/webm")) 10240 else 0) // prefer opus stream
-                    }
+                    it.bitrate * when (audioQuality) {
+                        AudioQuality.AUTO -> if (connectivityManager.isActiveNetworkMetered) -1 else 1
+                        AudioQuality.HIGH -> 1
+                        AudioQuality.LOW -> -1
+                    } + (if (it.mimeType.startsWith("audio/webm")) 10240 else 0) // prefer opus stream
+                }
             } ?: throw PlaybackException(
                 getString(R.string.error_no_stream), null, ERROR_CODE_NO_STREAM
             )
@@ -645,7 +646,8 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
         override fun buildAudioSink(
             context: Context, enableFloatOutput: Boolean, enableAudioTrackPlaybackParams: Boolean
         ): AudioSink {
-            return DefaultAudioSink.Builder(this@MusicService).setEnableFloatOutput(enableFloatOutput)
+            return DefaultAudioSink.Builder(this@MusicService)
+                .setEnableFloatOutput(enableFloatOutput)
 
                 .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
                 .setAudioProcessorChain(

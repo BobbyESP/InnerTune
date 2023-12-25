@@ -72,7 +72,11 @@ class DownloadUtil @Inject constructor(
             YouTube.player(mediaId)
         }.getOrThrow()
         if (playerResponse.playabilityStatus.status != "OK") {
-            throw PlaybackException(playerResponse.playabilityStatus.reason, null, PlaybackException.ERROR_CODE_REMOTE_ERROR)
+            throw PlaybackException(
+                playerResponse.playabilityStatus.reason,
+                null,
+                PlaybackException.ERROR_CODE_REMOTE_ERROR
+            )
         }
 
         val format =
@@ -108,11 +112,19 @@ class DownloadUtil @Inject constructor(
             )
         }
 
-        songUrlCache[mediaId] = format.url!! to playerResponse.streamingData!!.expiresInSeconds * 1000L
+        songUrlCache[mediaId] =
+            format.url!! to playerResponse.streamingData!!.expiresInSeconds * 1000L
         dataSpec.withUri(format.url!!.toUri())
     }
-    val downloadNotificationHelper = DownloadNotificationHelper(context, ExoDownloadService.CHANNEL_ID)
-    val downloadManager: DownloadManager = DownloadManager(context, databaseProvider, downloadCache, dataSourceFactory, Executor(Runnable::run)).apply {
+    val downloadNotificationHelper =
+        DownloadNotificationHelper(context, ExoDownloadService.CHANNEL_ID)
+    val downloadManager: DownloadManager = DownloadManager(
+        context,
+        databaseProvider,
+        downloadCache,
+        dataSourceFactory,
+        Executor(Runnable::run)
+    ).apply {
         maxParallelDownloads = 3
         addListener(
             ExoDownloadService.TerminalStateNotificationHelper(
@@ -135,7 +147,11 @@ class DownloadUtil @Inject constructor(
         downloads.value = result
         downloadManager.addListener(
             object : DownloadManager.Listener {
-                override fun onDownloadChanged(downloadManager: DownloadManager, download: Download, finalException: Exception?) {
+                override fun onDownloadChanged(
+                    downloadManager: DownloadManager,
+                    download: Download,
+                    finalException: Exception?
+                ) {
                     downloads.update { map ->
                         map.toMutableMap().apply {
                             set(download.request.id, download)

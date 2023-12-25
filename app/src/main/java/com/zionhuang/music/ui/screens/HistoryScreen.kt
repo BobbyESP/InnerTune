@@ -53,8 +53,13 @@ fun HistoryScreen(
     val events by viewModel.events.collectAsState()
 
     LazyColumn(
-        contentPadding = LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom).asPaddingValues(),
-        modifier = Modifier.windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Top))
+        contentPadding = LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+            .asPaddingValues(),
+        modifier = Modifier.windowInsetsPadding(
+            LocalPlayerAwareWindowInsets.current.only(
+                WindowInsetsSides.Top
+            )
+        )
     ) {
         events.forEach { (dateAgo, events) ->
             stickyHeader {

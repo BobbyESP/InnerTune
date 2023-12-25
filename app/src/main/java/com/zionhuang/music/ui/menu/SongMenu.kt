@@ -75,7 +75,8 @@ fun SongMenu(
     val playerConnection = LocalPlayerConnection.current ?: return
     val songState = database.song(originalSong.id).collectAsState(initial = originalSong)
     val song = songState.value ?: originalSong
-    val download by LocalDownloadUtil.current.getDownload(originalSong.id).collectAsState(initial = null)
+    val download by LocalDownloadUtil.current.getDownload(originalSong.id)
+        .collectAsState(initial = null)
 
     var showEditDialog by rememberSaveable {
         mutableStateOf(false)
@@ -86,7 +87,10 @@ fun SongMenu(
             icon = { Icon(painter = painterResource(R.drawable.edit), contentDescription = null) },
             title = { Text(text = stringResource(R.string.edit_song)) },
             onDismiss = { showEditDialog = false },
-            initialTextFieldValue = TextFieldValue(song.song.title, TextRange(song.song.title.length)),
+            initialTextFieldValue = TextFieldValue(
+                song.song.title,
+                TextRange(song.song.title.length)
+            ),
             onDone = { title ->
                 onDismiss()
                 database.query {
@@ -201,7 +205,12 @@ fun SongMenu(
             title = R.string.start_radio
         ) {
             onDismiss()
-            playerConnection.playQueue(YouTubeQueue(WatchEndpoint(videoId = song.id), song.toMediaMetadata()))
+            playerConnection.playQueue(
+                YouTubeQueue(
+                    WatchEndpoint(videoId = song.id),
+                    song.toMediaMetadata()
+                )
+            )
         }
         GridMenuItem(
             icon = R.drawable.playlist_play,

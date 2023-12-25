@@ -4,7 +4,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -15,7 +20,18 @@ import androidx.navigation.NavController
 import com.zionhuang.innertube.utils.parseCookieString
 import com.zionhuang.music.LocalPlayerAwareWindowInsets
 import com.zionhuang.music.R
-import com.zionhuang.music.constants.*
+import com.zionhuang.music.constants.AccountChannelHandleKey
+import com.zionhuang.music.constants.AccountEmailKey
+import com.zionhuang.music.constants.AccountNameKey
+import com.zionhuang.music.constants.ContentCountryKey
+import com.zionhuang.music.constants.ContentLanguageKey
+import com.zionhuang.music.constants.CountryCodeToName
+import com.zionhuang.music.constants.InnerTubeCookieKey
+import com.zionhuang.music.constants.LanguageCodeToName
+import com.zionhuang.music.constants.ProxyEnabledKey
+import com.zionhuang.music.constants.ProxyTypeKey
+import com.zionhuang.music.constants.ProxyUrlKey
+import com.zionhuang.music.constants.SYSTEM_DEFAULT
 import com.zionhuang.music.ui.component.EditTextPreference
 import com.zionhuang.music.ui.component.ListPreference
 import com.zionhuang.music.ui.component.PreferenceEntry
@@ -38,11 +54,26 @@ fun ContentSettings(
     val isLoggedIn = remember(innerTubeCookie) {
         "SAPISID" in parseCookieString(innerTubeCookie)
     }
-    val (contentLanguage, onContentLanguageChange) = rememberPreference(key = ContentLanguageKey, defaultValue = "system")
-    val (contentCountry, onContentCountryChange) = rememberPreference(key = ContentCountryKey, defaultValue = "system")
-    val (proxyEnabled, onProxyEnabledChange) = rememberPreference(key = ProxyEnabledKey, defaultValue = false)
-    val (proxyType, onProxyTypeChange) = rememberEnumPreference(key = ProxyTypeKey, defaultValue = Proxy.Type.HTTP)
-    val (proxyUrl, onProxyUrlChange) = rememberPreference(key = ProxyUrlKey, defaultValue = "host:port")
+    val (contentLanguage, onContentLanguageChange) = rememberPreference(
+        key = ContentLanguageKey,
+        defaultValue = "system"
+    )
+    val (contentCountry, onContentCountryChange) = rememberPreference(
+        key = ContentCountryKey,
+        defaultValue = "system"
+    )
+    val (proxyEnabled, onProxyEnabledChange) = rememberPreference(
+        key = ProxyEnabledKey,
+        defaultValue = false
+    )
+    val (proxyType, onProxyTypeChange) = rememberEnumPreference(
+        key = ProxyTypeKey,
+        defaultValue = Proxy.Type.HTTP
+    )
+    val (proxyUrl, onProxyUrlChange) = rememberPreference(
+        key = ProxyUrlKey,
+        defaultValue = "host:port"
+    )
 
 
     Column(

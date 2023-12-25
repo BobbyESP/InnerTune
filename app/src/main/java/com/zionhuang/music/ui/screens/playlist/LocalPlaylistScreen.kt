@@ -130,8 +130,14 @@ fun LocalPlaylistScreen(
     val playlistLength = remember(songs) {
         songs.fastSumBy { it.song.song.duration }
     }
-    val (sortType, onSortTypeChange) = rememberEnumPreference(PlaylistSongSortTypeKey, PlaylistSongSortType.CUSTOM)
-    val (sortDescending, onSortDescendingChange) = rememberPreference(PlaylistSongSortDescendingKey, true)
+    val (sortType, onSortTypeChange) = rememberEnumPreference(
+        PlaylistSongSortTypeKey,
+        PlaylistSongSortType.CUSTOM
+    )
+    val (sortDescending, onSortDescendingChange) = rememberPreference(
+        PlaylistSongSortDescendingKey,
+        true
+    )
     var locked by rememberPreference(PlaylistEditLockKey, defaultValue = false)
 
     val coroutineScope = rememberCoroutineScope()
@@ -170,10 +176,18 @@ fun LocalPlaylistScreen(
     if (showEditDialog) {
         playlist?.playlist?.let { playlistEntity ->
             TextFieldDialog(
-                icon = { Icon(painter = painterResource(R.drawable.edit), contentDescription = null) },
+                icon = {
+                    Icon(
+                        painter = painterResource(R.drawable.edit),
+                        contentDescription = null
+                    )
+                },
                 title = { Text(text = stringResource(R.string.edit_playlist)) },
                 onDismiss = { showEditDialog = false },
-                initialTextFieldValue = TextFieldValue(playlistEntity.name, TextRange(playlistEntity.name.length)),
+                initialTextFieldValue = TextFieldValue(
+                    playlistEntity.name,
+                    TextRange(playlistEntity.name.length)
+                ),
                 onDone = { name ->
                     database.query {
                         update(playlistEntity.copy(name = name))
@@ -276,7 +290,11 @@ fun LocalPlaylistScreen(
                                     )
 
                                     Text(
-                                        text = pluralStringResource(R.plurals.n_song, playlist.songCount, playlist.songCount),
+                                        text = pluralStringResource(
+                                            R.plurals.n_song,
+                                            playlist.songCount,
+                                            playlist.songCount
+                                        ),
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Normal
                                     )
@@ -301,7 +319,10 @@ fun LocalPlaylistScreen(
                                             IconButton(
                                                 onClick = {
                                                     coroutineScope.launch(Dispatchers.IO) {
-                                                        val playlistPage = YouTube.playlist(playlist.playlist.browseId).completed().getOrNull() ?: return@launch
+                                                        val playlistPage =
+                                                            YouTube.playlist(playlist.playlist.browseId)
+                                                                .completed().getOrNull()
+                                                                ?: return@launch
                                                         database.transaction {
                                                             clearPlaylist(playlist.id)
                                                             playlistPage.songs
@@ -316,7 +337,11 @@ fun LocalPlaylistScreen(
                                                                 }
                                                                 .forEach(::insert)
                                                         }
-                                                        snackbarHostState.showSnackbar(context.getString(R.string.playlist_synced))
+                                                        snackbarHostState.showSnackbar(
+                                                            context.getString(
+                                                                R.string.playlist_synced
+                                                            )
+                                                        )
                                                     }
                                                 }
                                             ) {
@@ -372,10 +397,14 @@ fun LocalPlaylistScreen(
                                                 IconButton(
                                                     onClick = {
                                                         songs.forEach { song ->
-                                                            val downloadRequest = DownloadRequest.Builder(song.song.id, song.song.id.toUri())
-                                                                .setCustomCacheKey(song.song.id)
-                                                                .setData(song.song.song.title.toByteArray())
-                                                                .build()
+                                                            val downloadRequest =
+                                                                DownloadRequest.Builder(
+                                                                    song.song.id,
+                                                                    song.song.id.toUri()
+                                                                )
+                                                                    .setCustomCacheKey(song.song.id)
+                                                                    .setData(song.song.song.title.toByteArray())
+                                                                    .build()
                                                             DownloadService.sendAddDownload(
                                                                 context,
                                                                 ExoDownloadService::class.java,
@@ -423,7 +452,8 @@ fun LocalPlaylistScreen(
                                         playerConnection.playQueue(
                                             ListQueue(
                                                 title = playlist.playlist.name,
-                                                items = songs.shuffled().map { it.song.toMediaItem() }
+                                                items = songs.shuffled()
+                                                    .map { it.song.toMediaItem() }
                                             )
                                         )
                                     },
@@ -494,20 +524,31 @@ fun LocalPlaylistScreen(
                         confirmValueChange = { dismissValue ->
                             if (dismissValue == DismissValue.DismissedToEnd || dismissValue == DismissValue.DismissedToStart) {
                                 database.transaction {
-                                    move(currentItem.map.playlistId, currentItem.map.position, Int.MAX_VALUE)
+                                    move(
+                                        currentItem.map.playlistId,
+                                        currentItem.map.position,
+                                        Int.MAX_VALUE
+                                    )
                                     delete(currentItem.map.copy(position = Int.MAX_VALUE))
                                 }
                                 dismissJob?.cancel()
                                 dismissJob = coroutineScope.launch {
                                     val snackbarResult = snackbarHostState.showSnackbar(
-                                        message = context.getString(R.string.removed_song_from_playlist, currentItem.song.song.title),
+                                        message = context.getString(
+                                            R.string.removed_song_from_playlist,
+                                            currentItem.song.song.title
+                                        ),
                                         actionLabel = context.getString(R.string.undo),
                                         duration = SnackbarDuration.Short
                                     )
                                     if (snackbarResult == SnackbarResult.ActionPerformed) {
                                         database.transaction {
                                             insert(currentItem.map.copy(position = playlistLength))
-                                            move(currentItem.map.playlistId, playlistLength, currentItem.map.position)
+                                            move(
+                                                currentItem.map.playlistId,
+                                                playlistLength,
+                                                currentItem.map.position
+                                            )
                                         }
                                     }
                                 }

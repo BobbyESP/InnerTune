@@ -62,8 +62,14 @@ fun ArtistSongsScreen(
     val isPlaying by playerConnection.isPlaying.collectAsState()
     val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
 
-    val (sortType, onSortTypeChange) = rememberEnumPreference(ArtistSongSortTypeKey, ArtistSongSortType.CREATE_DATE)
-    val (sortDescending, onSortDescendingChange) = rememberPreference(ArtistSongSortDescendingKey, true)
+    val (sortType, onSortTypeChange) = rememberEnumPreference(
+        ArtistSongSortTypeKey,
+        ArtistSongSortType.CREATE_DATE
+    )
+    val (sortDescending, onSortDescendingChange) = rememberPreference(
+        ArtistSongSortDescendingKey,
+        true
+    )
 
     val artist by viewModel.artist.collectAsState()
     val songs by viewModel.songs.collectAsState()

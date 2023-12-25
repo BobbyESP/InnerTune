@@ -102,14 +102,20 @@ fun LyricsMenu(
     val searchMediaMetadata = remember(showSearchDialog) {
         mediaMetadataProvider()
     }
-    val (titleField, onTitleFieldChange) = rememberSaveable(showSearchDialog, stateSaver = TextFieldValue.Saver) {
+    val (titleField, onTitleFieldChange) = rememberSaveable(
+        showSearchDialog,
+        stateSaver = TextFieldValue.Saver
+    ) {
         mutableStateOf(
             TextFieldValue(
                 text = mediaMetadataProvider().title
             )
         )
     }
-    val (artistField, onArtistFieldChange) = rememberSaveable(showSearchDialog, stateSaver = TextFieldValue.Saver) {
+    val (artistField, onArtistFieldChange) = rememberSaveable(
+        showSearchDialog,
+        stateSaver = TextFieldValue.Saver
+    ) {
         mutableStateOf(
             TextFieldValue(
                 text = mediaMetadataProvider().artists.joinToString { it.name }
@@ -121,7 +127,12 @@ fun LyricsMenu(
         DefaultDialog(
             modifier = Modifier.verticalScroll(rememberScrollState()),
             onDismiss = { showSearchDialog = false },
-            icon = { Icon(painter = painterResource(R.drawable.search), contentDescription = null) },
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.search),
+                    contentDescription = null
+                )
+            },
             title = { Text(stringResource(R.string.search_lyrics)) },
             buttons = {
                 TextButton(
@@ -139,7 +150,10 @@ fun LyricsMenu(
                         try {
                             context.startActivity(
                                 Intent(Intent.ACTION_WEB_SEARCH).apply {
-                                    putExtra(SearchManager.QUERY, "${artistField.text} ${titleField.text} lyrics")
+                                    putExtra(
+                                        SearchManager.QUERY,
+                                        "${artistField.text} ${titleField.text} lyrics"
+                                    )
                                 }
                             )
                         } catch (_: Exception) {
@@ -153,7 +167,12 @@ fun LyricsMenu(
 
                 TextButton(
                     onClick = {
-                        viewModel.search(searchMediaMetadata.id, titleField.text, artistField.text, searchMediaMetadata.duration)
+                        viewModel.search(
+                            searchMediaMetadata.id,
+                            titleField.text,
+                            artistField.text,
+                            searchMediaMetadata.duration
+                        )
                         showSearchResultDialog = true
                     }
                 ) {

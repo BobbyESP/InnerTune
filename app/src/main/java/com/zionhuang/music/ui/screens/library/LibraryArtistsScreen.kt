@@ -64,7 +64,10 @@ fun LibraryArtistsScreen(
     val menuState = LocalMenuState.current
     var filter by rememberEnumPreference(ArtistFilterKey, ArtistFilter.LIBRARY)
     var viewType by rememberEnumPreference(ArtistViewTypeKey, LibraryViewType.GRID)
-    val (sortType, onSortTypeChange) = rememberEnumPreference(ArtistSortTypeKey, ArtistSortType.CREATE_DATE)
+    val (sortType, onSortTypeChange) = rememberEnumPreference(
+        ArtistSortTypeKey,
+        ArtistSortType.CREATE_DATE
+    )
     val (sortDescending, onSortDescendingChange) = rememberPreference(ArtistSortDescendingKey, true)
 
     val artists by viewModel.allArtists.collectAsState()

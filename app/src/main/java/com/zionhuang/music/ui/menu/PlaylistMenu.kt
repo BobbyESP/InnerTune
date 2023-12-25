@@ -48,7 +48,10 @@ fun PlaylistMenu(
             icon = { Icon(painter = painterResource(R.drawable.edit), contentDescription = null) },
             title = { Text(text = stringResource(R.string.edit_playlist)) },
             onDismiss = { showEditDialog = false },
-            initialTextFieldValue = TextFieldValue(playlist.playlist.name, TextRange(playlist.playlist.name.length)),
+            initialTextFieldValue = TextFieldValue(
+                playlist.playlist.name,
+                TextRange(playlist.playlist.name.length)
+            ),
             onDone = { name ->
                 onDismiss()
                 database.query {
@@ -80,7 +83,9 @@ fun PlaylistMenu(
             ) {
                 onDismiss()
                 coroutineScope.launch(Dispatchers.IO) {
-                    val playlistPage = YouTube.playlist(playlist.playlist.browseId).completed().getOrNull() ?: return@launch
+                    val playlistPage =
+                        YouTube.playlist(playlist.playlist.browseId).completed().getOrNull()
+                            ?: return@launch
                     database.transaction {
                         clearPlaylist(playlist.id)
                         playlistPage.songs

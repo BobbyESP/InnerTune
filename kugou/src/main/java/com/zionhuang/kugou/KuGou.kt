@@ -4,16 +4,16 @@ import com.github.houbb.opencc4j.util.ZhConverterUtil
 import com.zionhuang.kugou.models.DownloadLyricsResponse
 import com.zionhuang.kugou.models.SearchLyricsResponse
 import com.zionhuang.kugou.models.SearchSongResponse
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.engine.okhttp.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.compression.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import io.ktor.util.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.plugins.compression.ContentEncoding
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.http.ContentType
+import io.ktor.http.encodeURLParameter
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.util.decodeBase64String
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import java.lang.Character.UnicodeScript
@@ -48,14 +48,21 @@ object KuGou {
         }
     }
 
-    suspend fun getLyrics(title: String, artist: String, duration: Int): Result<String> = runCatching {
-        val keyword = generateKeyword(title, artist)
-        getLyricsCandidate(keyword, duration)?.let { candidate ->
-            downloadLyrics(candidate.id, candidate.accesskey).content.decodeBase64String().normalize(keyword)
-        } ?: throw IllegalStateException("No lyrics candidate")
-    }
+    suspend fun getLyrics(title: String, artist: String, duration: Int): Result<String> =
+        runCatching {
+            val keyword = generateKeyword(title, artist)
+            getLyricsCandidate(keyword, duration)?.let { candidate ->
+                downloadLyrics(candidate.id, candidate.accesskey).content.decodeBase64String()
+                    .normalize(keyword)
+            } ?: throw IllegalStateException("No lyrics candidate")
+        }
 
-    suspend fun getAllLyrics(title: String, artist: String, duration: Int, callback: (String) -> Unit) {
+    suspend fun getAllLyrics(
+        title: String,
+        artist: String,
+        duration: Int,
+        callback: (String) -> Unit
+    ) {
         val keyword = generateKeyword(title, artist)
         searchSongs(keyword).data.info.forEach {
             if (duration == -1 || abs(it.duration - duration) <= DURATION_TOLERANCE) {
@@ -77,7 +84,10 @@ object KuGou {
         }
     }
 
-    suspend fun getLyricsCandidate(keyword: Pair<String, String>, duration: Int): SearchLyricsResponse.Candidate? {
+    suspend fun getLyricsCandidate(
+        keyword: Pair<String, String>,
+        duration: Int
+    ): SearchLyricsResponse.Candidate? {
         searchSongs(keyword).data.info.forEach { song ->
             if (duration == -1 || abs(song.duration - duration) <= DURATION_TOLERANCE) { // if duration == -1, we don't care duration
                 val candidate = searchLyricsByHash(song.hash).candidates.firstOrNull()
@@ -93,7 +103,10 @@ object KuGou {
             parameter("plat", 0)
             parameter("pagesize", 8)
             parameter("showtype", 0)
-            url.encodedParameters.append("keyword", "${keyword.first} - ${keyword.second}".encodeURLParameter(spaceToPlus = false))
+            url.encodedParameters.append(
+                "keyword",
+                "${keyword.first} - ${keyword.second}".encodeURLParameter(spaceToPlus = false)
+            )
         }.body<SearchSongResponse>()
 
     private suspend fun searchLyricsByKeyword(keyword: Pair<String, String>, duration: Int) =
@@ -101,8 +114,14 @@ object KuGou {
             parameter("ver", 1)
             parameter("man", "yes")
             parameter("client", "pc")
-            parameter("duration", duration.takeIf { it != -1 }?.times(1000)) // if duration == -1, we don't care duration
-            url.encodedParameters.append("keyword", "${keyword.first} - ${keyword.second}".encodeURLParameter(spaceToPlus = false))
+            parameter(
+                "duration",
+                duration.takeIf { it != -1 }?.times(1000)
+            ) // if duration == -1, we don't care duration
+            url.encodedParameters.append(
+                "keyword",
+                "${keyword.first} - ${keyword.second}".encodeURLParameter(spaceToPlus = false)
+            )
         }.body<SearchLyricsResponse>()
 
     private suspend fun searchLyricsByHash(hash: String) =
@@ -141,7 +160,8 @@ object KuGou {
         .replace("\\(.*\\)".toRegex(), "")
         .replace("（.*）".toRegex(), "")
 
-    fun generateKeyword(title: String, artist: String) = normalizeTitle(title) to normalizeArtist(artist)
+    fun generateKeyword(title: String, artist: String) =
+        normalizeTitle(title) to normalizeArtist(artist)
 
     private fun String.normalize(keyword: Pair<String, String>): String? =
         replace("&apos;", "'").lines().filter { line ->

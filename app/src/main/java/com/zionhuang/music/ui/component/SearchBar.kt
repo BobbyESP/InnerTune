@@ -141,7 +141,8 @@ fun SearchBar(
     }
 
     val topInset = windowInsets.asPaddingValues().calculateTopPadding()
-    val startInset = windowInsets.asPaddingValues().calculateStartPadding(LocalLayoutDirection.current)
+    val startInset =
+        windowInsets.asPaddingValues().calculateStartPadding(LocalLayoutDirection.current)
     val endInset = windowInsets.asPaddingValues().calculateEndPadding(LocalLayoutDirection.current)
 
     val topPadding = SearchBarVerticalPadding + topInset
@@ -178,8 +179,16 @@ fun SearchBar(
 
             height = lerp(startHeight, endHeight, animationProgress).toDp()
             width = lerp(startWidth, endWidth, animationProgress).toDp()
-            startPadding = lerp((SearchBarHorizontalPadding + startInset).roundToPx().toFloat(), 0f, animationProgress).toDp()
-            endPadding = lerp((SearchBarHorizontalPadding + endInset).roundToPx().toFloat(), 0f, animationProgress).toDp()
+            startPadding = lerp(
+                (SearchBarHorizontalPadding + startInset).roundToPx().toFloat(),
+                0f,
+                animationProgress
+            ).toDp()
+            endPadding = lerp(
+                (SearchBarHorizontalPadding + endInset).roundToPx().toFloat(),
+                0f,
+                animationProgress
+            ).toDp()
         }
 
         Surface(
@@ -247,7 +256,11 @@ private fun SearchBarInputField(
     val searchSemantics = getString(Strings.SearchBarSearch)
     val suggestionsAvailableSemantics = getString(Strings.SuggestionsAvailable)
     val textColor = LocalTextStyle.current.color.takeOrElse {
-        colors.textColor(enabled = enabled, interactionSource = interactionSource, isError = false).value
+        colors.textColor(
+            enabled = enabled,
+            interactionSource = interactionSource,
+            isError = false
+        ).value
     }
 
     Row(
@@ -306,7 +319,11 @@ private fun SearchBarInputField(
                     if (placeholder != null && query.text.isEmpty()) {
                         Box(Modifier.alpha(0.8f)) {
                             Decoration(
-                                contentColor = colors.placeholderColor(enabled = enabled, interactionSource = interactionSource, isError = false).value,
+                                contentColor = colors.placeholderColor(
+                                    enabled = enabled,
+                                    interactionSource = interactionSource,
+                                    isError = false
+                                ).value,
                                 typography = MaterialTheme.typography.bodyLarge,
                                 content = placeholder
                             )

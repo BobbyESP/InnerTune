@@ -171,9 +171,10 @@ fun AlbumScreen(
                                 }
                             }
                             ClickableText(annotatedString) { offset ->
-                                annotatedString.getStringAnnotations(offset, offset).firstOrNull()?.let { range ->
-                                    navController.navigate("artist/${range.tag}")
-                                }
+                                annotatedString.getStringAnnotations(offset, offset).firstOrNull()
+                                    ?.let { range ->
+                                        navController.navigate("artist/${range.tag}")
+                                    }
                             }
 
                             if (albumWithSongs.album.year != null) {
@@ -244,7 +245,10 @@ fun AlbumScreen(
                                         IconButton(
                                             onClick = {
                                                 albumWithSongs.songs.forEach { song ->
-                                                    val downloadRequest = DownloadRequest.Builder(song.id, song.id.toUri())
+                                                    val downloadRequest = DownloadRequest.Builder(
+                                                        song.id,
+                                                        song.id.toUri()
+                                                    )
                                                         .setCustomCacheKey(song.id)
                                                         .setData(song.song.title.toByteArray())
                                                         .build()
@@ -269,7 +273,10 @@ fun AlbumScreen(
                                     onClick = {
                                         menuState.show {
                                             AlbumMenu(
-                                                originalAlbum = Album(albumWithSongs.album, albumWithSongs.artists),
+                                                originalAlbum = Album(
+                                                    albumWithSongs.album,
+                                                    albumWithSongs.artists
+                                                ),
                                                 navController = navController,
                                                 onDismiss = menuState::dismiss
                                             )
@@ -316,7 +323,8 @@ fun AlbumScreen(
                                 playerConnection.playQueue(
                                     ListQueue(
                                         title = albumWithSongs.album.title,
-                                        items = albumWithSongs.songs.shuffled().map(Song::toMediaItem)
+                                        items = albumWithSongs.songs.shuffled()
+                                            .map(Song::toMediaItem)
                                     )
                                 )
                             },

@@ -43,7 +43,10 @@ object AppModule {
     @Singleton
     @Provides
     @PlayerCache
-    fun providePlayerCache(@ApplicationContext context: Context, databaseProvider: DatabaseProvider): SimpleCache {
+    fun providePlayerCache(
+        @ApplicationContext context: Context,
+        databaseProvider: DatabaseProvider
+    ): SimpleCache {
         val constructor = {
             SimpleCache(
                 context.filesDir.resolve("exoplayer"),
@@ -61,7 +64,10 @@ object AppModule {
     @Singleton
     @Provides
     @DownloadCache
-    fun provideDownloadCache(@ApplicationContext context: Context, databaseProvider: DatabaseProvider): SimpleCache {
+    fun provideDownloadCache(
+        @ApplicationContext context: Context,
+        databaseProvider: DatabaseProvider
+    ): SimpleCache {
         val constructor = {
             SimpleCache(context.filesDir.resolve("download"), NoOpCacheEvictor(), databaseProvider)
         }

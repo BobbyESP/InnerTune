@@ -122,7 +122,12 @@ fun ArtistScreen(
     LazyColumn(
         state = lazyListState,
         contentPadding = LocalPlayerAwareWindowInsets.current
-            .add(WindowInsets(top = -WindowInsets.systemBars.asPaddingValues().calculateTopPadding() - AppBarHeight))
+            .add(
+                WindowInsets(
+                    top = -WindowInsets.systemBars.asPaddingValues()
+                        .calculateTopPadding() - AppBarHeight
+                )
+            )
             .asPaddingValues()
     ) {
         artistPage.let {
@@ -247,7 +252,13 @@ fun ArtistScreen(
                                     if (song.id == mediaMetadata?.id) {
                                         playerConnection.player.togglePlayPause()
                                     } else {
-                                        playerConnection.playQueue(YouTubeQueue(WatchEndpoint(videoId = song.id), song.toMediaMetadata()))
+                                        playerConnection.playQueue(
+                                            YouTubeQueue(
+                                                WatchEndpoint(
+                                                    videoId = song.id
+                                                ), song.toMediaMetadata()
+                                            )
+                                        )
                                     }
                                 }
                                 .animateItemPlacement()
@@ -299,7 +310,13 @@ fun ArtistScreen(
                                         if (song.id == mediaMetadata?.id) {
                                             playerConnection.player.togglePlayPause()
                                         } else {
-                                            playerConnection.playQueue(YouTubeQueue(WatchEndpoint(videoId = song.id), song.toMediaMetadata()))
+                                            playerConnection.playQueue(
+                                                YouTubeQueue(
+                                                    WatchEndpoint(
+                                                        videoId = song.id
+                                                    ), song.toMediaMetadata()
+                                                )
+                                            )
                                         }
                                     }
                                     .animateItemPlacement()
@@ -325,7 +342,13 @@ fun ArtistScreen(
                                             .combinedClickable(
                                                 onClick = {
                                                     when (item) {
-                                                        is SongItem -> playerConnection.playQueue(YouTubeQueue(WatchEndpoint(videoId = item.id), item.toMediaMetadata()))
+                                                        is SongItem -> playerConnection.playQueue(
+                                                            YouTubeQueue(
+                                                                WatchEndpoint(videoId = item.id),
+                                                                item.toMediaMetadata()
+                                                            )
+                                                        )
+
                                                         is AlbumItem -> navController.navigate("album/${item.id}")
                                                         is ArtistItem -> navController.navigate("artist/${item.id}")
                                                         is PlaylistItem -> navController.navigate("online_playlist/${item.id}")

@@ -63,8 +63,13 @@ fun StatsScreen(
     val coroutineScope = rememberCoroutineScope()
 
     LazyColumn(
-        contentPadding = LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom).asPaddingValues(),
-        modifier = Modifier.windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Top))
+        contentPadding = LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+            .asPaddingValues(),
+        modifier = Modifier.windowInsetsPadding(
+            LocalPlayerAwareWindowInsets.current.only(
+                WindowInsetsSides.Top
+            )
+        )
     ) {
         item {
             ChipsRow(
