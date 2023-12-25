@@ -638,9 +638,9 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
     }
 
     private fun createMediaSourceFactory() =
-        DefaultMediaSourceFactory(createDataSourceFactory(), ExtractorsFactory {
+        DefaultMediaSourceFactory(createDataSourceFactory()) {
             arrayOf(MatroskaExtractor(), FragmentedMp4Extractor())
-        })
+        }
 
     private fun createRenderersFactory() = object : DefaultRenderersFactory(this) {
         override fun buildAudioSink(
