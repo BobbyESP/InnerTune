@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,15 +58,13 @@ fun AboutScreen(
     ) {
         Spacer(Modifier.height(4.dp))
 
-        Image(
-            painter = painterResource(R.drawable.launcher_monochrome),
+        Image(painter = painterResource(R.drawable.launcher_monochrome),
             contentDescription = null,
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground, BlendMode.SrcIn),
             modifier = Modifier
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.surfaceColorAtElevation(NavigationBarDefaults.Elevation))
-                .clickable { }
-        )
+                .clickable { })
 
         Row(
             verticalAlignment = Alignment.Top,
@@ -98,8 +97,7 @@ fun AboutScreen(
                         shape = CircleShape
                     )
                     .padding(
-                        horizontal = 6.dp,
-                        vertical = 2.dp
+                        horizontal = 6.dp, vertical = 2.dp
                     )
             )
 
@@ -117,8 +115,7 @@ fun AboutScreen(
                             shape = CircleShape
                         )
                         .padding(
-                            horizontal = 6.dp,
-                            vertical = 2.dp
+                            horizontal = 6.dp, vertical = 2.dp
                         )
                 )
             }
@@ -131,50 +128,62 @@ fun AboutScreen(
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.secondary
         )
-
-        Spacer(Modifier.height(8.dp))
-
-        Row {
-            IconButton(
-                onClick = { uriHandler.openUri("https://github.com/z-huang/InnerTune") }
-            ) {
+        Row(modifier = Modifier.padding(top = 4.dp)) {
+            IconButton(onClick = { uriHandler.openUri("https://github.com/z-huang/InnerTune") }) {
                 Icon(
-                    painter = painterResource(R.drawable.github),
-                    contentDescription = null
+                    painter = painterResource(R.drawable.github), contentDescription = null
                 )
             }
 
-            IconButton(
-                onClick = { uriHandler.openUri("https://liberapay.com/zionhuang") }
-            ) {
+            IconButton(onClick = { uriHandler.openUri("https://liberapay.com/zionhuang") }) {
                 Icon(
-                    painter = painterResource(R.drawable.liberapay),
-                    contentDescription = null
+                    painter = painterResource(R.drawable.liberapay), contentDescription = null
                 )
             }
 
-            IconButton(
-                onClick = { uriHandler.openUri("https://www.buymeacoffee.com/zionhuang") }
-            ) {
+            IconButton(onClick = { uriHandler.openUri("https://www.buymeacoffee.com/zionhuang") }) {
                 Icon(
-                    painter = painterResource(R.drawable.buymeacoffee),
-                    contentDescription = null
+                    painter = painterResource(R.drawable.buymeacoffee), contentDescription = null
                 )
             }
         }
 
-    }
+        Divider(
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .padding(vertical = 8.dp)
+        )
 
-    TopAppBar(
-        title = { Text(stringResource(R.string.about)) },
-        navigationIcon = {
-            IconButton(onClick = navController::navigateUp) {
+        Text(
+            modifier = Modifier.padding(bottom = 8.dp),
+            text = stringResource(R.string.fork_description),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.secondary
+        )
+
+        Row(modifier = Modifier.padding(top = 4.dp)) {
+            IconButton(onClick = { uriHandler.openUri("https://github.com/BobbyESP/InnerTune") }) {
                 Icon(
-                    painterResource(R.drawable.arrow_back),
-                    contentDescription = null
+                    painter = painterResource(R.drawable.github), contentDescription = null
                 )
             }
-        },
-        scrollBehavior = scrollBehavior
+
+            IconButton(onClick = { uriHandler.openUri("https://www.paypal.com/paypalme/bobbyesp") }) {
+                Icon(
+                    painter = painterResource(R.drawable.paypal_fill), contentDescription = null, modifier = Modifier
+                        .height(24.dp)
+                        .width(24.dp)
+                )
+            }
+        }
+    }
+
+    TopAppBar(title = { Text(stringResource(R.string.about)) }, navigationIcon = {
+        IconButton(onClick = navController::navigateUp) {
+            Icon(
+                painterResource(R.drawable.arrow_back), contentDescription = null
+            )
+        }
+    }, scrollBehavior = scrollBehavior
     )
 }
