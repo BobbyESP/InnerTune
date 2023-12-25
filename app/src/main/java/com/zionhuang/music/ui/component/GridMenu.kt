@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -102,6 +103,26 @@ fun LazyGridScope.GridMenuItem(
         }
     }
 }
+
+fun LazyGridScope.GridMenuItem(
+    modifier: Modifier = Modifier,
+    icon: ImageVector,
+    @StringRes title: Int,
+    enabled: Boolean = true,
+    onClick: () -> Unit,
+) = GridMenuItem(
+    modifier = modifier,
+    icon = {
+        Icon(
+            imageVector = icon,
+            contentDescription = null
+        )
+    },
+    title = title,
+    enabled = enabled,
+    onClick = onClick
+)
+
 
 
 fun LazyGridScope.DownloadGridMenu(

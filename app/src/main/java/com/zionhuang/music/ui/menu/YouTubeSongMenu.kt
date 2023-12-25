@@ -13,6 +13,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Album
+import androidx.compose.material.icons.filled.LibraryAdd
+import androidx.compose.material.icons.filled.LibraryAddCheck
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.PlaylistAdd
+import androidx.compose.material.icons.filled.PlaylistPlay
+import androidx.compose.material.icons.filled.QueueMusic
+import androidx.compose.material.icons.filled.Radio
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -199,7 +210,7 @@ fun YouTubeSongMenu(
         )
     ) {
         GridMenuItem(
-            icon = R.drawable.play,
+            icon = Icons.Default.PlayArrow,
             title = R.string.play
         ) {
             playerConnection.playQueue(
@@ -212,7 +223,7 @@ fun YouTubeSongMenu(
             onDismiss()
         }
         GridMenuItem(
-            icon = R.drawable.radio,
+            icon = Icons.Default.Radio,
             title = R.string.start_radio
         ) {
             playerConnection.playQueue(
@@ -224,14 +235,14 @@ fun YouTubeSongMenu(
             onDismiss()
         }
         GridMenuItem(
-            icon = R.drawable.playlist_play,
+            icon = Icons.Default.PlaylistPlay,
             title = R.string.play_next
         ) {
             playerConnection.playNext(song.toMediaItem())
             onDismiss()
         }
         GridMenuItem(
-            icon = R.drawable.queue_music,
+            icon = Icons.Default.QueueMusic,
             title = R.string.add_to_queue
         ) {
             playerConnection.addToQueue((song.toMediaItem()))
@@ -239,7 +250,7 @@ fun YouTubeSongMenu(
         }
         if (librarySong?.song?.inLibrary != null) {
             GridMenuItem(
-                icon = R.drawable.library_add_check,
+                icon = Icons.Default.LibraryAddCheck,
                 title = R.string.remove_from_library
             ) {
                 database.query {
@@ -248,7 +259,7 @@ fun YouTubeSongMenu(
             }
         } else {
             GridMenuItem(
-                icon = R.drawable.library_add,
+                icon = Icons.Default.LibraryAdd,
                 title = R.string.add_to_library
             ) {
                 database.transaction {
@@ -258,7 +269,7 @@ fun YouTubeSongMenu(
             }
         }
         GridMenuItem(
-            icon = R.drawable.playlist_add,
+            icon = Icons.Default.PlaylistAdd,
             title = R.string.add_to_playlist
         ) {
             showChoosePlaylistDialog = true
@@ -291,7 +302,7 @@ fun YouTubeSongMenu(
         )
         if (artists.isNotEmpty()) {
             GridMenuItem(
-                icon = R.drawable.artist,
+                icon = Icons.Default.Person,
                 title = R.string.view_artist
             ) {
                 if (artists.size == 1) {
@@ -304,7 +315,7 @@ fun YouTubeSongMenu(
         }
         song.album?.let { album ->
             GridMenuItem(
-                icon = R.drawable.album,
+                icon = Icons.Default.Album,
                 title = R.string.view_album
             ) {
                 navController.navigate("album/${album.id}")
@@ -312,7 +323,7 @@ fun YouTubeSongMenu(
             }
         }
         GridMenuItem(
-            icon = R.drawable.share,
+            icon = Icons.Default.Share,
             title = R.string.share
         ) {
             val intent = Intent().apply {
