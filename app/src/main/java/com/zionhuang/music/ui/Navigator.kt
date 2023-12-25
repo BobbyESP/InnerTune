@@ -70,7 +70,9 @@ import androidx.core.net.toUri
 import androidx.core.util.Consumer
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -85,6 +87,7 @@ import com.zionhuang.music.LocalDownloadUtil
 import com.zionhuang.music.LocalPlayerAwareWindowInsets
 import com.zionhuang.music.LocalPlayerConnection
 import com.zionhuang.music.MainActivity
+import com.zionhuang.music.MainActivity.Companion.sharedSong
 import com.zionhuang.music.R
 import com.zionhuang.music.constants.AppBarHeight
 import com.zionhuang.music.constants.DefaultOpenTabKey
@@ -153,7 +156,7 @@ import java.net.URLEncoder
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Navigator(
-    activity: MainActivity,
+    navController: NavHostController,
     playerConnection: PlayerConnection?,
     latestVersion: Long,
     database: MusicDatabase,
@@ -171,7 +174,6 @@ fun Navigator(
         val windowsInsets = WindowInsets.systemBars
         val bottomInset = with(density) { windowsInsets.getBottom(density).toDp() }
 
-        val navController = rememberNavController()
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         var canNavigateUp by remember(navBackStackEntry) {
             mutableStateOf(false)
@@ -185,11 +187,7 @@ fun Navigator(
 
         val navigationItems = remember {
             listOf(
-                Screens.Home,
-                Screens.Songs,
-                Screens.Artists,
-                Screens.Albums,
-                Screens.Playlists
+                Screens.Home, Screens.Songs, Screens.Artists, Screens.Albums, Screens.Playlists
             )
         }
         val defaultOpenTab = remember {
@@ -310,8 +308,7 @@ fun Navigator(
         }
 
         DisposableEffect(playerConnection, playerBottomSheetState) {
-            val player =
-                playerConnection?.player ?: return@DisposableEffect onDispose { }
+            val player = playerConnection?.player ?: return@DisposableEffect onDispose { }
             val listener = object : Player.Listener {
                 override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                     if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED && mediaItem != null && playerBottomSheetState.isDismissed) {
@@ -325,20 +322,6 @@ fun Navigator(
             }
         }
 
-        val coroutineScope = rememberCoroutineScope()
-        var sharedSong: SongItem? by remember {
-            mutableStateOf(null)
-        }
-        DisposableEffect(Unit) {
-            val listener = Consumer<Intent> { intent ->
-                val uri = intent.data ?: intent.extras?.getString(Intent.EXTRA_TEXT)?.toUri()
-                ?: return@Consumer
-                processUri(uri, navController, coroutineScope)
-            }
-
-            activity.addOnNewIntentListener(listener)
-            onDispose { activity.removeOnNewIntentListener(listener) }
-        }
         CompositionLocalProvider(
             LocalDatabase provides database,
             LocalContentColor provides contentColorFor(MaterialTheme.colorScheme.background),
@@ -389,8 +372,7 @@ fun Navigator(
                     NewReleaseScreen(navController, scrollBehavior)
                 }
                 composable(
-                    route = "search/{query}",
-                    arguments = listOf(navArgument("query") {
+                    route = "search/{query}", arguments = listOf(navArgument("query") {
                         type = NavType.StringType
                     })
                 ) {
@@ -406,8 +388,7 @@ fun Navigator(
                     AlbumScreen(navController, scrollBehavior)
                 }
                 composable(
-                    route = "artist/{artistId}",
-                    arguments = listOf(navArgument("artistId") {
+                    route = "artist/{artistId}", arguments = listOf(navArgument("artistId") {
                         type = NavType.StringType
                     })
                 ) { backStackEntry ->
@@ -419,8 +400,7 @@ fun Navigator(
                     }
                 }
                 composable(
-                    route = "artist/{artistId}/songs",
-                    arguments = listOf(navArgument("artistId") {
+                    route = "artist/{artistId}/songs", arguments = listOf(navArgument("artistId") {
                         type = NavType.StringType
                     })
                 ) {
@@ -658,8 +638,7 @@ fun Navigator(
                     NavigationBarItem(selected = navBackStackEntry?.destination?.hierarchy?.any { it.route == screen.route } == true,
                         icon = {
                             Icon(
-                                painter = painterResource(screen.iconId),
-                                contentDescription = null
+                                painter = painterResource(screen.iconId), contentDescription = null
                             )
                         },
                         label = {
@@ -682,29 +661,27 @@ fun Navigator(
             }
 
             BottomSheetMenu(
-                state = LocalMenuState.current,
-                modifier = Modifier.align(Alignment.BottomCenter)
+                state = LocalMenuState.current, modifier = Modifier.align(Alignment.BottomCenter)
             )
 
-            sharedSong?.let { song ->
-                playerConnection?.let { playerConnection ->
-                    Dialog(
-                        onDismissRequest = { sharedSong = null },
-                        properties = DialogProperties(usePlatformDefaultWidth = false)
+            sharedSong.value?.let { song ->
+                Dialog(
+                    onDismissRequest = { sharedSong.value = null },
+                    properties = DialogProperties(usePlatformDefaultWidth = false)
+                ) {
+                    Surface(
+                        modifier = Modifier.padding(24.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        color = AlertDialogDefaults.containerColor,
+                        tonalElevation = AlertDialogDefaults.TonalElevation
                     ) {
-                        Surface(
-                            modifier = Modifier.padding(24.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            color = AlertDialogDefaults.containerColor,
-                            tonalElevation = AlertDialogDefaults.TonalElevation
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                YouTubeSongMenu(song = song,
-                                    navController = navController,
-                                    onDismiss = { sharedSong = null })
-                            }
+                            YouTubeSongMenu(
+                                song = song,
+                                navController = navController,
+                                onDismiss = { sharedSong.value = null })
                         }
                     }
                 }

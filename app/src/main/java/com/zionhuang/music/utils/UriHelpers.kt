@@ -3,16 +3,22 @@ package com.zionhuang.music.utils
 import android.net.Uri
 import androidx.navigation.NavController
 import com.zionhuang.innertube.YouTube
+import com.zionhuang.music.MainActivity.Companion.sharedSong
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 fun processUri(uri: Uri, navController: NavController, coroutineScope: CoroutineScope) {
-    when (uri.pathSegments.firstOrNull()) {
+    val uriPathSegments = uri.pathSegments
+    Timber.i("uriPathSegments: $uriPathSegments")
+    when (uriPathSegments.firstOrNull()) {
         "playlist" -> handlePlaylistUri(uri, navController, coroutineScope)
 
         "channel", "c" -> handleChannelUri(uri, navController)
 
-        else -> handleDefaultUri(uri)
+        else -> handleDefaultUri(uri, coroutineScope)
     }
 }
 
@@ -37,8 +43,23 @@ private fun handleChannelUri(uri: Uri, navController: NavController) {
     }
 }
 
-private fun handleDefaultUri(uri: Uri) {
-    // Your existing logic for default cases
+private fun handleDefaultUri(uri: Uri, coroutineScope: CoroutineScope) {
+    val path = uri.pathSegments.firstOrNull()
+    when {
+        path == "watch" -> uri.getQueryParameter("v")
+        uri.host == "youtu.be" -> path
+        else -> null
+    }?.let { videoId ->
+        coroutineScope.launch {
+            withContext(Dispatchers.IO) {
+                YouTube.queue(listOf(videoId))
+            }.onSuccess {
+                sharedSong.value = it.firstOrNull()
+            }.onFailure {
+                reportException(it)
+            }
+        }
+    }
 }
 
 private fun Uri.extractPlaylistId(): String? {

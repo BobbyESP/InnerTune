@@ -107,6 +107,7 @@ dependencies {
     implementation(libs.compose.animation)
     implementation(libs.compose.animation.graphics)
     implementation(libs.compose.reorderable)
+    implementation(libs.compose.material.icons.extended)
 
     implementation(libs.viewmodel)
     implementation(libs.viewmodel.compose)
@@ -114,8 +115,6 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.palette)
     implementation(projects.materialColorUtilities)
-
-    implementation(libs.accompanist.swiperefresh)
 
     implementation(libs.coil)
 

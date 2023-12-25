@@ -13,21 +13,28 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.core.net.toUri
+import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.rememberNavController
 import coil.imageLoader
 import coil.request.ImageRequest
+import com.zionhuang.innertube.models.SongItem
 import com.zionhuang.music.constants.DarkModeKey
 import com.zionhuang.music.constants.DynamicThemeKey
 import com.zionhuang.music.constants.PureBlackKey
@@ -42,6 +49,7 @@ import com.zionhuang.music.ui.theme.ColorSaver
 import com.zionhuang.music.ui.theme.DefaultThemeColor
 import com.zionhuang.music.ui.theme.InnerTuneTheme
 import com.zionhuang.music.ui.theme.extractThemeColor
+import com.zionhuang.music.utils.processUri
 import com.zionhuang.music.utils.rememberEnumPreference
 import com.zionhuang.music.utils.rememberPreference
 import com.zionhuang.music.utils.setupRemoteConfig
@@ -112,6 +120,8 @@ class MainActivity : ComponentActivity() {
             val latestVersion by remember {
                 mutableLongStateOf(BuildConfig.VERSION_CODE.toLong())
             }
+            val navController = rememberNavController()
+            val coroutineScope = rememberCoroutineScope()
 
             LaunchedEffect(playerConnection, enableDynamicTheme, isSystemInDarkTheme) {
                 val playerConnection = playerConnection
@@ -134,11 +144,22 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
+            DisposableEffect(Unit) {
+                val listener = Consumer<Intent> { intent ->
+                    val uri = intent.data ?: intent.extras?.getString(Intent.EXTRA_TEXT)?.toUri()
+                    ?: return@Consumer
+                    processUri(uri, navController, coroutineScope)
+                }
+
+                addOnNewIntentListener(listener)
+                onDispose { removeOnNewIntentListener(listener) }
+            }
+
             InnerTuneTheme(
                 darkTheme = useDarkTheme, pureBlack = pureBlack, themeColor = themeColor
             ) {
                 Navigator(
-                    activity = this,
+                    navController = navController,
                     playerConnection = playerConnection,
                     latestVersion = latestVersion,
                     database = database,
@@ -170,6 +191,8 @@ class MainActivity : ComponentActivity() {
         const val ACTION_SONGS = "com.zionhuang.music.action.SONGS"
         const val ACTION_ALBUMS = "com.zionhuang.music.action.ALBUMS"
         const val ACTION_PLAYLISTS = "com.zionhuang.music.action.PLAYLISTS"
+
+        var sharedSong: MutableState<SongItem?> = mutableStateOf(null)
     }
 }
 

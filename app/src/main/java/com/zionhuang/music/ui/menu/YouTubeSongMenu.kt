@@ -199,6 +199,18 @@ fun YouTubeSongMenu(
         )
     ) {
         GridMenuItem(
+            icon = R.drawable.play,
+            title = R.string.play
+        ) {
+            playerConnection.playQueue(
+                YouTubeQueue(
+                    WatchEndpoint(videoId = song.id),
+                    song.toMediaMetadata()
+                )
+            )
+            onDismiss()
+        }
+        GridMenuItem(
             icon = R.drawable.radio,
             title = R.string.start_radio
         ) {
