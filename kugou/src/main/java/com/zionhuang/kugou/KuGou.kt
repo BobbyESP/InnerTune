@@ -1,6 +1,5 @@
 package com.zionhuang.kugou
 
-import com.github.houbb.opencc4j.util.ZhConverterUtil
 import com.zionhuang.kugou.models.DownloadLyricsResponse
 import com.zionhuang.kugou.models.Keyword
 import com.zionhuang.kugou.models.SearchLyricsResponse
@@ -61,7 +60,7 @@ object KuGou {
             } ?: throw IllegalStateException("No lyrics candidate")
         }
 
-    suspend fun getAllLyrics(
+    suspend fun getAllPossibleLyricsOptions(
         title: String, artist: String, duration: Int, callback: (String) -> Unit
     ) {
         val keyword = generateKeyword(title, artist)
@@ -170,32 +169,8 @@ object KuGou {
                 }
                 val finalLines = filteredLines.dropLast(tailCutLine)
 
-                finalLines.takeIf {
-                    it.isNotEmpty() && "纯音乐，请欣赏" !in it[0]
-                }?.let NormalizedLines@{ nonEmptyLines ->
-                    val firstLine = nonEmptyLines.firstOrNull()?.toSimplifiedChinese()
-                        ?: return@NormalizedLines nonEmptyLines
-                    val (title, artist) = keyword
-                    if (title.toSimplifiedChinese() in firstLine || artist.split("、")
-                            .any { it.toSimplifiedChinese() in firstLine }
-                    ) {
-                        nonEmptyLines.drop(1)
-                    } else nonEmptyLines
-                }?.joinToString(separator = "\n")?.let {
-                    if (useTraditionalChinese) it.normalizeForTraditionalChinese()
-                    else it
-                }
+                return@let finalLines.joinToString("\n")
             }
-
-    private fun String.normalizeForTraditionalChinese(): String =
-        if (none { c -> UnicodeScript.of(c.code) in JapaneseUnicodeScript }) {
-            toTraditionalChinese().replace('着', '著').replace('羣', '群')
-        } else {
-            this
-        }
-
-    private fun String.toSimplifiedChinese() = ZhConverterUtil.toSimple(this)
-    private fun String.toTraditionalChinese() = ZhConverterUtil.toTraditional(this)
 
     @Suppress("RegExpRedundantEscape")
     private val ACCEPTED_REGEX = "\\[(\\d\\d):(\\d\\d)\\.(\\d{2,3})\\].*".toRegex()

@@ -48,6 +48,15 @@ class LyricsMenuViewModel @Inject constructor(
         job = null
     }
 
+    fun chooseLyrics(mediaMetadata: MediaMetadata, lyricsResult: LyricsResult) {
+        viewModelScope.launch(Dispatchers.IO) {
+            cancelSearch()
+            database.query {
+                upsert(LyricsEntity(mediaMetadata.id, lyricsResult.lyrics))
+            }
+        }
+    }
+
     suspend fun refetchLyrics(mediaMetadata: MediaMetadata, lyricsEntity: LyricsEntity?) {
         val lyricsDeferred = withContext(Dispatchers.IO) {
             async { lyricsHelper.getLyrics(mediaMetadata) }

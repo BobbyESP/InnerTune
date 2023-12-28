@@ -47,6 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zionhuang.music.LocalDatabase
 import com.zionhuang.music.R
 import com.zionhuang.music.db.entities.LyricsEntity
@@ -204,8 +205,8 @@ fun LyricsMenu(
     }
 
     if (showSearchResultDialog) {
-        val results by viewModel.results.collectAsState()
-        val isLoading by viewModel.isLoading.collectAsState()
+        val results by viewModel.results.collectAsStateWithLifecycle()
+        val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
         var expandedItemIndex by rememberSaveable {
             mutableIntStateOf(-1)
@@ -214,21 +215,13 @@ fun LyricsMenu(
         ListDialog(
             onDismiss = { showSearchResultDialog = false }
         ) {
-            itemsIndexed(results) { index, result ->
+            itemsIndexed(results) { index, lyrics ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
                             onDismiss()
-                            viewModel.cancelSearch()
-                            database.query {
-                                upsert(
-                                    LyricsEntity(
-                                        id = searchMediaMetadata.id,
-                                        lyrics = result.lyrics
-                                    )
-                                )
-                            }
+                            viewModel.chooseLyrics(searchMediaMetadata, lyrics)
                         }
                         .padding(12.dp)
                         .animateContentSize()
@@ -237,7 +230,7 @@ fun LyricsMenu(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = result.lyrics,
+                            text = lyrics.lyrics,
                             style = MaterialTheme.typography.bodyMedium,
                             maxLines = if (index == expandedItemIndex) Int.MAX_VALUE else 2,
                             overflow = TextOverflow.Ellipsis,
@@ -248,12 +241,12 @@ fun LyricsMenu(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = result.providerName,
+                                text = lyrics.providerName,
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.secondary,
                                 maxLines = 1
                             )
-                            if (result.lyrics.startsWith("[")) {
+                            if (lyrics.lyrics.startsWith("[")) {
                                 Icon(
                                     painter = painterResource(R.drawable.sync),
                                     contentDescription = null,
