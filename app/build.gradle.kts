@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.ksp)
-    kotlin("kapt")
 }
 
 if (isFullBuild && System.getenv("PULL_REQUEST") == null) {
@@ -71,15 +70,15 @@ android {
     }
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlin {
-        jvmToolchain(11)
+        jvmToolchain(17)
     }
     kotlinOptions {
         freeCompilerArgs = freeCompilerArgs + "-Xcontext-receivers"
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
     testOptions {
         unitTests.isIncludeAndroidResources = true
@@ -98,6 +97,7 @@ dependencies {
     implementation(libs.navigation)
     implementation(libs.hilt.navigation)
     implementation(libs.datastore)
+    implementation(libs.lifecycle.runtime)
 
     implementation(libs.compose.runtime)
     implementation(libs.compose.foundation)
@@ -133,6 +133,8 @@ dependencies {
     implementation(libs.hilt)
     ksp(libs.hilt.compiler)
 
+    implementation(libs.timber)
+
     implementation(projects.innertube)
     implementation(projects.kugou)
 
@@ -147,5 +149,4 @@ dependencies {
     "fullImplementation"(libs.mlkit.translate)
     "fullImplementation"(libs.opencc4j)
 
-    implementation(libs.timber)
 }

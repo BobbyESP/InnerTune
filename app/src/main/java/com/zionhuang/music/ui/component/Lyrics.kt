@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zionhuang.music.BuildConfig
 import com.zionhuang.music.LocalPlayerConnection
 import com.zionhuang.music.R
@@ -79,9 +80,9 @@ fun Lyrics(
     val lyricsTextPosition by rememberEnumPreference(LyricsTextPositionKey, LyricsPosition.CENTER)
     var translationEnabled by rememberPreference(TranslateLyricsKey, false)
 
-    val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
-    val translating by playerConnection.translating.collectAsState()
-    val lyricsEntity by playerConnection.currentLyrics.collectAsState(initial = null)
+    val mediaMetadata by playerConnection.mediaMetadata.collectAsStateWithLifecycle()
+    val translating by playerConnection.translating.collectAsStateWithLifecycle()
+    val lyricsEntity by playerConnection.currentLyrics.collectAsStateWithLifecycle(initialValue = null)
     val lyrics = remember(lyricsEntity, translating) {
         if (translating) null
         else lyricsEntity?.lyrics
