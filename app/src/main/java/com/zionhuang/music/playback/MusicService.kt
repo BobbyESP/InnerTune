@@ -45,7 +45,6 @@ import androidx.media3.exoplayer.audio.DefaultAudioSink
 import androidx.media3.exoplayer.audio.SilenceSkippingAudioProcessor
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.ShuffleOrder.DefaultShuffleOrder
-import androidx.media3.extractor.ExtractorsFactory
 import androidx.media3.extractor.mkv.MatroskaExtractor
 import androidx.media3.extractor.mp4.FragmentedMp4Extractor
 import androidx.media3.session.CommandButton
@@ -76,7 +75,7 @@ import com.zionhuang.music.constants.ShowLyricsKey
 import com.zionhuang.music.constants.SkipSilenceKey
 import com.zionhuang.music.db.MusicDatabase
 import com.zionhuang.music.db.entities.Event
-import com.zionhuang.music.db.entities.FormatEntity
+import com.zionhuang.music.db.entities.format.FormatEntity
 import com.zionhuang.music.db.entities.LyricsEntity
 import com.zionhuang.music.db.entities.RelatedSongMap
 import com.zionhuang.music.di.DownloadCache

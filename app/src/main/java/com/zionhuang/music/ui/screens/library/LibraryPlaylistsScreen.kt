@@ -48,7 +48,7 @@ import com.zionhuang.music.constants.PlaylistSortDescendingKey
 import com.zionhuang.music.constants.PlaylistSortType
 import com.zionhuang.music.constants.PlaylistSortTypeKey
 import com.zionhuang.music.constants.PlaylistViewTypeKey
-import com.zionhuang.music.db.entities.PlaylistEntity
+import com.zionhuang.music.db.entities.playlist.PlaylistEntity
 import com.zionhuang.music.ui.component.HideOnScrollFAB
 import com.zionhuang.music.ui.component.LocalMenuState
 import com.zionhuang.music.ui.component.PlaylistGridItem

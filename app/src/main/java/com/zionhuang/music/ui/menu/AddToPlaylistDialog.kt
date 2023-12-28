@@ -22,7 +22,7 @@ import com.zionhuang.music.LocalDatabase
 import com.zionhuang.music.R
 import com.zionhuang.music.constants.ListThumbnailSize
 import com.zionhuang.music.db.entities.Playlist
-import com.zionhuang.music.db.entities.PlaylistEntity
+import com.zionhuang.music.db.entities.playlist.PlaylistEntity
 import com.zionhuang.music.ui.component.ListDialog
 import com.zionhuang.music.ui.component.ListItem
 import com.zionhuang.music.ui.component.PlaylistListItem

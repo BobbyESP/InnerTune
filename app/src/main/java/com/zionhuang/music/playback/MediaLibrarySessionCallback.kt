@@ -22,7 +22,7 @@ import com.zionhuang.music.R
 import com.zionhuang.music.constants.MediaSessionConstants
 import com.zionhuang.music.constants.SongSortType
 import com.zionhuang.music.db.MusicDatabase
-import com.zionhuang.music.db.entities.PlaylistEntity
+import com.zionhuang.music.db.entities.playlist.PlaylistEntity
 import com.zionhuang.music.db.entities.Song
 import com.zionhuang.music.extensions.toMediaItem
 import com.zionhuang.music.extensions.toggleRepeatMode

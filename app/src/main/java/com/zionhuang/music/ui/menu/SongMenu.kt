@@ -50,7 +50,7 @@ import com.zionhuang.music.R
 import com.zionhuang.music.constants.ListItemHeight
 import com.zionhuang.music.constants.ListThumbnailSize
 import com.zionhuang.music.db.entities.Event
-import com.zionhuang.music.db.entities.PlaylistSongMap
+import com.zionhuang.music.db.entities.playlist.PlaylistSongMap
 import com.zionhuang.music.db.entities.Song
 import com.zionhuang.music.extensions.toMediaItem
 import com.zionhuang.music.models.toMediaMetadata

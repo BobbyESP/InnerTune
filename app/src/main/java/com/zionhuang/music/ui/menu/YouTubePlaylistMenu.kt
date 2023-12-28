@@ -19,7 +19,7 @@ import com.zionhuang.innertube.utils.completed
 import com.zionhuang.music.LocalDatabase
 import com.zionhuang.music.LocalPlayerConnection
 import com.zionhuang.music.R
-import com.zionhuang.music.db.entities.PlaylistSongMap
+import com.zionhuang.music.db.entities.playlist.PlaylistSongMap
 import com.zionhuang.music.extensions.toMediaItem
 import com.zionhuang.music.models.toMediaMetadata
 import com.zionhuang.music.playback.queues.YouTubeQueue

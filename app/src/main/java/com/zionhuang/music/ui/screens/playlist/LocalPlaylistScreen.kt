@@ -82,8 +82,8 @@ import com.zionhuang.music.constants.PlaylistSongSortDescendingKey
 import com.zionhuang.music.constants.PlaylistSongSortType
 import com.zionhuang.music.constants.PlaylistSongSortTypeKey
 import com.zionhuang.music.constants.ThumbnailCornerRadius
-import com.zionhuang.music.db.entities.PlaylistSong
-import com.zionhuang.music.db.entities.PlaylistSongMap
+import com.zionhuang.music.db.entities.playlist.PlaylistSong
+import com.zionhuang.music.db.entities.playlist.PlaylistSongMap
 import com.zionhuang.music.extensions.move
 import com.zionhuang.music.extensions.toMediaItem
 import com.zionhuang.music.extensions.togglePlayPause

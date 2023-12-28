@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.zionhuang.music.db.entities.song.SongEntity
 
 @Entity(
     tableName = "related_song_map",

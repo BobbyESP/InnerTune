@@ -1,8 +1,9 @@
-package com.zionhuang.music.db.entities
+package com.zionhuang.music.db.entities.album
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import com.zionhuang.music.db.entities.artist.ArtistEntity
 
 @Entity(
     tableName = "album_artist_map",

@@ -1,12 +1,13 @@
-package com.zionhuang.music.db.entities
+package com.zionhuang.music.db.entities.song
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import com.zionhuang.music.db.entities.artist.ArtistEntity
 
 @Entity(
-    tableName = "song_album_map",
-    primaryKeys = ["songId", "albumId"],
+    tableName = "song_artist_map",
+    primaryKeys = ["songId", "artistId"],
     foreignKeys = [
         ForeignKey(
             entity = SongEntity::class,
@@ -15,15 +16,15 @@ import androidx.room.ForeignKey
             onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
-            entity = AlbumEntity::class,
+            entity = ArtistEntity::class,
             parentColumns = ["id"],
-            childColumns = ["albumId"],
+            childColumns = ["artistId"],
             onDelete = ForeignKey.CASCADE
         )
     ]
 )
-data class SongAlbumMap(
+data class SongArtistMap(
     @ColumnInfo(index = true) val songId: String,
-    @ColumnInfo(index = true) val albumId: String,
-    val index: Int,
+    @ColumnInfo(index = true) val artistId: String,
+    val position: Int,
 )

@@ -17,7 +17,7 @@ import com.zionhuang.innertube.YouTube
 import com.zionhuang.music.constants.AudioQuality
 import com.zionhuang.music.constants.AudioQualityKey
 import com.zionhuang.music.db.MusicDatabase
-import com.zionhuang.music.db.entities.FormatEntity
+import com.zionhuang.music.db.entities.format.FormatEntity
 import com.zionhuang.music.di.DownloadCache
 import com.zionhuang.music.di.PlayerCache
 import com.zionhuang.music.utils.enumPreference

@@ -45,7 +45,7 @@ import com.zionhuang.music.LocalDownloadUtil
 import com.zionhuang.music.LocalPlayerConnection
 import com.zionhuang.music.R
 import com.zionhuang.music.constants.ListItemHeight
-import com.zionhuang.music.db.entities.PlaylistSongMap
+import com.zionhuang.music.db.entities.playlist.PlaylistSongMap
 import com.zionhuang.music.extensions.toMediaItem
 import com.zionhuang.music.playback.ExoDownloadService
 import com.zionhuang.music.playback.queues.YouTubeAlbumRadio

@@ -61,8 +61,8 @@ import com.zionhuang.music.LocalPlayerConnection
 import com.zionhuang.music.R
 import com.zionhuang.music.constants.AlbumThumbnailSize
 import com.zionhuang.music.constants.ThumbnailCornerRadius
-import com.zionhuang.music.db.entities.PlaylistEntity
-import com.zionhuang.music.db.entities.PlaylistSongMap
+import com.zionhuang.music.db.entities.playlist.PlaylistEntity
+import com.zionhuang.music.db.entities.playlist.PlaylistSongMap
 import com.zionhuang.music.extensions.togglePlayPause
 import com.zionhuang.music.models.toMediaMetadata
 import com.zionhuang.music.playback.queues.YouTubeQueue

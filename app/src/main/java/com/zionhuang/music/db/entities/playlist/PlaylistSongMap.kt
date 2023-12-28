@@ -1,9 +1,10 @@
-package com.zionhuang.music.db.entities
+package com.zionhuang.music.db.entities.playlist
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.zionhuang.music.db.entities.song.SongEntity
 
 @Entity(
     tableName = "playlist_song_map",

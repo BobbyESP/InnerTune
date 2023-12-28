@@ -67,7 +67,7 @@ import com.zionhuang.music.LocalPlayerAwareWindowInsets
 import com.zionhuang.music.LocalPlayerConnection
 import com.zionhuang.music.R
 import com.zionhuang.music.constants.AppBarHeight
-import com.zionhuang.music.db.entities.ArtistEntity
+import com.zionhuang.music.db.entities.artist.ArtistEntity
 import com.zionhuang.music.extensions.togglePlayPause
 import com.zionhuang.music.models.toMediaMetadata
 import com.zionhuang.music.playback.queues.YouTubeQueue

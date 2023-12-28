@@ -14,11 +14,11 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
--keepattributes SourceFile,LineNumberTable
+#-keepattributes SourceFile,LineNumberTable
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
--renamesourcefileattribute SourceFile
+#-renamesourcefileattribute SourceFile
 
 ## Kotlin Serialization
 # Keep `Companion` object fields of serializable classes.
@@ -45,6 +45,11 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 
+-keep class androidx.savedstate.SavedStateRegistry$AutoRecreated { *; }
+
+-keepclassmembers class androidx.savedstate.SavedStateRegistry$AutoRecreated {
+    <init>(...);
+}
 # Keep all implementations of androix.datastore.preferences.protobuf
 -keep class androidx.datastore.preferences.** { *; }
 

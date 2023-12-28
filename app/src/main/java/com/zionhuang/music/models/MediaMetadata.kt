@@ -3,6 +3,7 @@ package com.zionhuang.music.models
 import androidx.compose.runtime.Immutable
 import com.zionhuang.innertube.models.SongItem
 import com.zionhuang.music.db.entities.*
+import com.zionhuang.music.db.entities.song.SongEntity
 import com.zionhuang.music.ui.utils.resize
 import java.io.Serializable
 

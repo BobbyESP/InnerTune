@@ -4,6 +4,9 @@ import androidx.compose.runtime.Immutable
 import androidx.room.Embedded
 import androidx.room.Junction
 import androidx.room.Relation
+import com.zionhuang.music.db.entities.playlist.PlaylistEntity
+import com.zionhuang.music.db.entities.playlist.PlaylistSongMapPreview
+import com.zionhuang.music.db.entities.song.SongEntity
 
 @Immutable
 data class Playlist(

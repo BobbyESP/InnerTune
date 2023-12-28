@@ -4,6 +4,11 @@ import androidx.compose.runtime.Immutable
 import androidx.room.Embedded
 import androidx.room.Junction
 import androidx.room.Relation
+import com.zionhuang.music.db.entities.album.AlbumEntity
+import com.zionhuang.music.db.entities.artist.ArtistEntity
+import com.zionhuang.music.db.entities.song.SongAlbumMap
+import com.zionhuang.music.db.entities.song.SongEntity
+import com.zionhuang.music.db.entities.song.SortedSongArtistMap
 
 @Immutable
 data class Song @JvmOverloads constructor(

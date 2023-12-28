@@ -1,4 +1,4 @@
-package com.zionhuang.music.db.entities
+package com.zionhuang.music.db.entities.song
 
 import androidx.room.ColumnInfo
 import androidx.room.DatabaseView

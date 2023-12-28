@@ -1,4 +1,4 @@
-package com.zionhuang.music.db.entities
+package com.zionhuang.music.db.entities.artist
 
 import androidx.compose.runtime.Immutable
 import androidx.room.Entity
