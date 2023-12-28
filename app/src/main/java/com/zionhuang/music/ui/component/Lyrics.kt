@@ -52,10 +52,10 @@ import com.zionhuang.music.R
 import com.zionhuang.music.constants.LyricsTextPositionKey
 import com.zionhuang.music.constants.TranslateLyricsKey
 import com.zionhuang.music.db.entities.LyricsEntity.Companion.LYRICS_NOT_FOUND
-import com.zionhuang.music.lyrics.LyricsEntry
-import com.zionhuang.music.lyrics.LyricsEntry.Companion.HEAD_LYRICS_ENTRY
-import com.zionhuang.music.lyrics.LyricsUtils.findCurrentLineIndex
-import com.zionhuang.music.lyrics.LyricsUtils.parseLyrics
+import com.zionhuang.music.lyrics.model.LyricsEntry
+import com.zionhuang.music.lyrics.model.LyricsEntry.Companion.HEAD_LYRICS_ENTRY
+import com.zionhuang.music.lyrics.utils.LyricsUtils.findCurrentLineIndex
+import com.zionhuang.music.lyrics.utils.LyricsUtils.parseLyrics
 import com.zionhuang.music.ui.component.shimmer.ShimmerHost
 import com.zionhuang.music.ui.component.shimmer.TextPlaceholder
 import com.zionhuang.music.ui.menu.LyricsMenu

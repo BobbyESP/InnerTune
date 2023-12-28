@@ -1,8 +1,9 @@
-package com.zionhuang.music.lyrics
+package com.zionhuang.music.lyrics.providers
 
 import android.content.Context
 import com.zionhuang.kugou.KuGou
 import com.zionhuang.music.constants.EnableKugouKey
+import com.zionhuang.music.lyrics.LyricsProvider
 import com.zionhuang.music.utils.dataStore
 import com.zionhuang.music.utils.get
 import timber.log.Timber

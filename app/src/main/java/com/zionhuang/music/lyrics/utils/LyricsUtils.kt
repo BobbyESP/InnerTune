@@ -1,6 +1,7 @@
-package com.zionhuang.music.lyrics
+package com.zionhuang.music.lyrics.utils
 
 import android.text.format.DateUtils
+import com.zionhuang.music.lyrics.model.LyricsEntry
 import com.zionhuang.music.ui.component.animateScrollDuration
 
 @Suppress("RegExpRedundantEscape")

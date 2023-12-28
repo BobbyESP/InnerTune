@@ -34,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -56,6 +57,8 @@ import com.zionhuang.music.ui.component.GridMenuItem
 import com.zionhuang.music.ui.component.ListDialog
 import com.zionhuang.music.ui.component.TextFieldDialog
 import com.zionhuang.music.viewmodels.LyricsMenuViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -67,6 +70,8 @@ fun LyricsMenu(
 ) {
     val context = LocalContext.current
     val database = LocalDatabase.current
+
+    val scope = rememberCoroutineScope()
 
     var showEditDialog by rememberSaveable {
         mutableStateOf(false)
@@ -317,7 +322,9 @@ fun LyricsMenu(
             title = R.string.refetch
         ) {
             onDismiss()
-            viewModel.refetchLyrics(mediaMetadataProvider(), lyricsProvider())
+            scope.launch(Dispatchers.IO) {
+                viewModel.refetchLyrics(mediaMetadataProvider(), lyricsProvider())
+            }
         }
         GridMenuItem(
             icon = R.drawable.search,

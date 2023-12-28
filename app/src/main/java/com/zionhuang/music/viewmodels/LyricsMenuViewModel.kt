@@ -10,10 +10,13 @@ import com.zionhuang.music.models.MediaMetadata
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,7 +33,8 @@ class LyricsMenuViewModel @Inject constructor(
         results.value = emptyList()
         job?.cancel()
         job = viewModelScope.launch(Dispatchers.IO) {
-            lyricsHelper.getAllLyrics(mediaId, title, artist, duration) { result ->
+            lyricsHelper.getLyricsFromAllProviders(mediaId, title, artist, duration) { result ->
+                Timber.i("LyricsMenuViewModel search: $result")
                 results.update {
                     it + result
                 }
@@ -44,13 +48,23 @@ class LyricsMenuViewModel @Inject constructor(
         job = null
     }
 
-    fun refetchLyrics(mediaMetadata: MediaMetadata, lyricsEntity: LyricsEntity?) {
+    suspend fun refetchLyrics(mediaMetadata: MediaMetadata, lyricsEntity: LyricsEntity?) {
+        val lyricsDeferred = withContext(Dispatchers.IO) {
+            async { lyricsHelper.getLyrics(mediaMetadata) }
+        }
+
+        val lyrics = runCatching {
+            lyricsDeferred.await()
+        }.getOrNull()
+
         database.query {
             lyricsEntity?.let(::delete)
-            val lyrics = runBlocking {
-                lyricsHelper.getLyrics(mediaMetadata)
+
+            lyrics?.let {
+                upsert(LyricsEntity(mediaMetadata.id, it))
             }
-            upsert(LyricsEntity(mediaMetadata.id, lyrics))
         }
+
     }
+
 }

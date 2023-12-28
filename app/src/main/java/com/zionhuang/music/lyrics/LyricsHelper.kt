@@ -3,9 +3,13 @@ package com.zionhuang.music.lyrics
 import android.content.Context
 import android.util.LruCache
 import com.zionhuang.music.db.entities.LyricsEntity.Companion.LYRICS_NOT_FOUND
+import com.zionhuang.music.lyrics.providers.KuGouLyricsProvider
+import com.zionhuang.music.lyrics.providers.YouTubeLyricsProvider
+import com.zionhuang.music.lyrics.providers.YouTubeSubtitleLyricsProvider
 import com.zionhuang.music.models.MediaMetadata
 import com.zionhuang.music.utils.reportException
 import dagger.hilt.android.qualifiers.ApplicationContext
+import timber.log.Timber
 import javax.inject.Inject
 
 class LyricsHelper @Inject constructor(
@@ -37,7 +41,7 @@ class LyricsHelper @Inject constructor(
         return LYRICS_NOT_FOUND
     }
 
-    suspend fun getAllLyrics(
+    suspend fun getLyricsFromAllProviders(
         mediaId: String,
         songTitle: String,
         songArtists: String,

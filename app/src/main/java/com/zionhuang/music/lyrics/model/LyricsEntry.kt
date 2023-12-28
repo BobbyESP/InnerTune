@@ -1,4 +1,4 @@
-package com.zionhuang.music.lyrics
+package com.zionhuang.music.lyrics.model
 
 data class LyricsEntry(
     val time: Long,

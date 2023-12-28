@@ -1,7 +1,8 @@
-package com.zionhuang.music.lyrics
+package com.zionhuang.music.lyrics.providers
 
 import android.content.Context
 import com.zionhuang.innertube.YouTube
+import com.zionhuang.music.lyrics.LyricsProvider
 
 object YouTubeSubtitleLyricsProvider : LyricsProvider {
     override val name = "YouTube Subtitle"
