@@ -62,35 +62,25 @@ object KuGou {
         }
 
     suspend fun getAllLyrics(
-        title: String,
-        artist: String,
-        duration: Int,
-        callback: (String) -> Unit
+        title: String, artist: String, duration: Int, callback: (String) -> Unit
     ) {
         val keyword = generateKeyword(title, artist)
         searchSongs(keyword).data.info.forEach {
             if (duration == -1 || abs(it.duration - duration) <= DURATION_TOLERANCE) {
                 searchLyricsByHash(it.hash).candidates.firstOrNull()?.let { candidate ->
-                    downloadLyrics(candidate.id, candidate.accesskey)
-                        .content
-                        .decodeBase64String()
-                        .normalize(keyword)
-                        ?.let(callback)
+                    downloadLyrics(candidate.id, candidate.accesskey).content.decodeBase64String()
+                        .normalize(keyword)?.let(callback)
                 }
             }
         }
         searchLyricsByKeyword(keyword, duration).candidates.forEach { candidate ->
-            downloadLyrics(candidate.id, candidate.accesskey)
-                .content
-                .decodeBase64String()
-                .normalize(keyword)
-                ?.let(callback)
+            downloadLyrics(candidate.id, candidate.accesskey).content.decodeBase64String()
+                .normalize(keyword)?.let(callback)
         }
     }
 
     suspend fun getLyricsCandidate(
-        keyword: Keyword,
-        duration: Int
+        keyword: Keyword, duration: Int
     ): SearchLyricsResponse.Candidate? {
         searchSongs(keyword).data.info.forEach { song ->
             if (duration == -1 || abs(song.duration - duration) <= DURATION_TOLERANCE) { // if duration == -1, we don't care duration
@@ -101,7 +91,7 @@ object KuGou {
         return searchLyricsByKeyword(keyword, duration).candidates.firstOrNull()
     }
 
-    private suspend fun searchSongs(keyword: Keyword) =
+    suspend fun searchSongs(keyword: Keyword) =
         client.get("https://mobileservice.kugou.com/api/v3/search/song") {
             parameter("version", 9108)
             parameter("plat", 0)
@@ -119,8 +109,7 @@ object KuGou {
             parameter("man", "yes")
             parameter("client", "pc")
             parameter(
-                "duration",
-                duration.takeIf { it != -1 }?.times(1000)
+                "duration", duration.takeIf { it != -1 }?.times(1000)
             ) // if duration == -1, we don't care duration
             url.encodedParameters.append(
                 "keyword",
@@ -146,30 +135,21 @@ object KuGou {
             parameter("accesskey", accessKey)
         }.body<DownloadLyricsResponse>()
 
-    private fun normalizeTitle(title: String) = title
-        .replace("\\(.*\\)".toRegex(), "")
-        .replace("（.*）".toRegex(), "")
-        .replace("「.*」".toRegex(), "")
-        .replace("『.*』".toRegex(), "")
-        .replace("<.*>".toRegex(), "")
-        .replace("《.*》".toRegex(), "")
-        .replace("〈.*〉".toRegex(), "")
-        .replace("＜.*＞".toRegex(), "")
+    private fun normalizeTitle(title: String) =
+        title.replace("\\(.*\\)".toRegex(), "").replace("（.*）".toRegex(), "")
+            .replace("「.*」".toRegex(), "").replace("『.*』".toRegex(), "")
+            .replace("<.*>".toRegex(), "").replace("《.*》".toRegex(), "")
+            .replace("〈.*〉".toRegex(), "").replace("＜.*＞".toRegex(), "")
 
-    private fun normalizeArtist(artist: String) = artist
-        .replace(", ", "、")
-        .replace(" & ", "、")
-        .replace(".", "")
-        .replace("和", "、")
-        .replace("\\(.*\\)".toRegex(), "")
-        .replace("（.*）".toRegex(), "")
+    private fun normalizeArtist(artist: String) =
+        artist.replace(", ", "、").replace(" & ", "、").replace(".", "").replace("和", "、")
+            .replace("\\(.*\\)".toRegex(), "").replace("（.*）".toRegex(), "")
 
     fun generateKeyword(title: String, artist: String) =
         Keyword(normalizeTitle(title), normalizeArtist(artist))
 
     private fun String.normalize(keyword: Keyword): String? =
-        replace("&apos;", "'").lines()
-            .filter { line -> line.matches(ACCEPTED_REGEX) }
+        replace("&apos;", "'").lines().filter { line -> line.matches(ACCEPTED_REGEX) }
             .let { lines ->
                 // Remove useless information such as singer, writer, composer, guitar, etc.
                 var headCutLine = 0
@@ -192,11 +172,12 @@ object KuGou {
 
                 finalLines.takeIf {
                     it.isNotEmpty() && "纯音乐，请欣赏" !in it[0]
-                }?.let NormalizedLines@ { nonEmptyLines ->
-                    val firstLine = nonEmptyLines.firstOrNull()?.toSimplifiedChinese() ?: return@NormalizedLines nonEmptyLines
+                }?.let NormalizedLines@{ nonEmptyLines ->
+                    val firstLine = nonEmptyLines.firstOrNull()?.toSimplifiedChinese()
+                        ?: return@NormalizedLines nonEmptyLines
                     val (title, artist) = keyword
-                    if (title.toSimplifiedChinese() in firstLine ||
-                        artist.split("、").any { it.toSimplifiedChinese() in firstLine }
+                    if (title.toSimplifiedChinese() in firstLine || artist.split("、")
+                            .any { it.toSimplifiedChinese() in firstLine }
                     ) {
                         nonEmptyLines.drop(1)
                     } else nonEmptyLines
@@ -208,9 +189,7 @@ object KuGou {
 
     private fun String.normalizeForTraditionalChinese(): String =
         if (none { c -> UnicodeScript.of(c.code) in JapaneseUnicodeScript }) {
-            toTraditionalChinese()
-                .replace('着', '著')
-                .replace('羣', '群')
+            toTraditionalChinese().replace('着', '著').replace('羣', '群')
         } else {
             this
         }
