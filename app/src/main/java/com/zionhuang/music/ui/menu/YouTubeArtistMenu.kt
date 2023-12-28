@@ -20,6 +20,7 @@ import com.zionhuang.innertube.models.ArtistItem
 import com.zionhuang.music.LocalDatabase
 import com.zionhuang.music.LocalPlayerConnection
 import com.zionhuang.music.R
+import com.zionhuang.music.db.entities.Artist
 import com.zionhuang.music.db.entities.ArtistEntity
 import com.zionhuang.music.playback.queues.YouTubeQueue
 import com.zionhuang.music.ui.component.GridMenu
@@ -43,9 +44,9 @@ fun YouTubeArtistMenu(
             IconButton(
                 onClick = {
                     database.query {
-                        val libraryArtist = libraryArtist
-                        if (libraryArtist != null) {
-                            update(libraryArtist.artist.toggleLike())
+                        val libArtist: Artist? = libraryArtist
+                        if (libArtist != null) {
+                            update(libArtist.artist.toggleLike())
                         } else {
                             insert(
                                 ArtistEntity(

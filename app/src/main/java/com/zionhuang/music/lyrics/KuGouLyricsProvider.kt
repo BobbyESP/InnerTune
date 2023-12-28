@@ -5,11 +5,17 @@ import com.zionhuang.kugou.KuGou
 import com.zionhuang.music.constants.EnableKugouKey
 import com.zionhuang.music.utils.dataStore
 import com.zionhuang.music.utils.get
+import timber.log.Timber
 
 object KuGouLyricsProvider : LyricsProvider {
     override val name = "Kugou"
-    override fun isEnabled(context: Context): Boolean =
-        context.dataStore[EnableKugouKey] ?: true
+
+    override fun isEnabled(context: Context): Boolean {
+        val dataStoreValue = context.dataStore[EnableKugouKey]
+        Timber.i("KuGouLyricsProvider isEnabled: $dataStoreValue")
+
+        return dataStoreValue ?: false
+    }
 
     override suspend fun getLyrics(
         id: String,

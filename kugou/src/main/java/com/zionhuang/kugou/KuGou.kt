@@ -2,6 +2,7 @@ package com.zionhuang.kugou
 
 import com.github.houbb.opencc4j.util.ZhConverterUtil
 import com.zionhuang.kugou.models.DownloadLyricsResponse
+import com.zionhuang.kugou.models.Keyword
 import com.zionhuang.kugou.models.SearchLyricsResponse
 import com.zionhuang.kugou.models.SearchSongResponse
 import io.ktor.client.HttpClient
@@ -20,33 +21,36 @@ import java.lang.Character.UnicodeScript
 import java.lang.Integer.min
 import kotlin.math.abs
 
+@OptIn(ExperimentalSerializationApi::class)
+private val client = HttpClient {
+    expectSuccess = true
+
+    install(ContentNegotiation) {
+        val json = Json {
+            ignoreUnknownKeys = true
+            explicitNulls = false
+            encodeDefaults = true
+        }
+        json(json)
+        json(json, ContentType.Text.Html)
+        json(json, ContentType.Text.Plain)
+    }
+
+    install(ContentEncoding) {
+        gzip()
+        deflate()
+    }
+}
+
+private const val PAGE_SIZE = 8
+private const val HEAD_CUT_LIMIT = 30
+
 /**
  * KuGou Lyrics Library
  * Modified from [ViMusic](https://github.com/vfsfitvnm/ViMusic)
  */
 object KuGou {
     var useTraditionalChinese: Boolean = false
-
-    @OptIn(ExperimentalSerializationApi::class)
-    private val client = HttpClient {
-        expectSuccess = true
-
-        install(ContentNegotiation) {
-            val json = Json {
-                ignoreUnknownKeys = true
-                explicitNulls = false
-                encodeDefaults = true
-            }
-            json(json)
-            json(json, ContentType.Text.Html)
-            json(json, ContentType.Text.Plain)
-        }
-
-        install(ContentEncoding) {
-            gzip()
-            deflate()
-        }
-    }
 
     suspend fun getLyrics(title: String, artist: String, duration: Int): Result<String> =
         runCatching {
@@ -85,7 +89,7 @@ object KuGou {
     }
 
     suspend fun getLyricsCandidate(
-        keyword: Pair<String, String>,
+        keyword: Keyword,
         duration: Int
     ): SearchLyricsResponse.Candidate? {
         searchSongs(keyword).data.info.forEach { song ->
@@ -97,19 +101,19 @@ object KuGou {
         return searchLyricsByKeyword(keyword, duration).candidates.firstOrNull()
     }
 
-    private suspend fun searchSongs(keyword: Pair<String, String>) =
+    private suspend fun searchSongs(keyword: Keyword) =
         client.get("https://mobileservice.kugou.com/api/v3/search/song") {
             parameter("version", 9108)
             parameter("plat", 0)
-            parameter("pagesize", 8)
+            parameter("pagesize", PAGE_SIZE)
             parameter("showtype", 0)
             url.encodedParameters.append(
                 "keyword",
-                "${keyword.first} - ${keyword.second}".encodeURLParameter(spaceToPlus = false)
+                "${keyword.title} - ${keyword.artist}".encodeURLParameter(spaceToPlus = false)
             )
         }.body<SearchSongResponse>()
 
-    private suspend fun searchLyricsByKeyword(keyword: Pair<String, String>, duration: Int) =
+    private suspend fun searchLyricsByKeyword(keyword: Keyword, duration: Int) =
         client.get("https://lyrics.kugou.com/search") {
             parameter("ver", 1)
             parameter("man", "yes")
@@ -120,7 +124,7 @@ object KuGou {
             ) // if duration == -1, we don't care duration
             url.encodedParameters.append(
                 "keyword",
-                "${keyword.first} - ${keyword.second}".encodeURLParameter(spaceToPlus = false)
+                "${keyword.title} - ${keyword.artist}".encodeURLParameter(spaceToPlus = false)
             )
         }.body<SearchLyricsResponse>()
 
@@ -161,50 +165,55 @@ object KuGou {
         .replace("（.*）".toRegex(), "")
 
     fun generateKeyword(title: String, artist: String) =
-        normalizeTitle(title) to normalizeArtist(artist)
+        Keyword(normalizeTitle(title), normalizeArtist(artist))
 
-    private fun String.normalize(keyword: Pair<String, String>): String? =
-        replace("&apos;", "'").lines().filter { line ->
-            line matches ACCEPTED_REGEX
-        }.let {
-            // Remove useless information such as singer, writer, composer, guitar, etc.
-            var headCutLine = 0
-            for (i in min(30, it.lastIndex) downTo 0) {
-                if (it[i] matches BANNED_REGEX) {
-                    headCutLine = i + 1
-                    break
+    private fun String.normalize(keyword: Keyword): String? =
+        replace("&apos;", "'").lines()
+            .filter { line -> line.matches(ACCEPTED_REGEX) }
+            .let { lines ->
+                // Remove useless information such as singer, writer, composer, guitar, etc.
+                var headCutLine = 0
+                for (i in min(HEAD_CUT_LIMIT, lines.lastIndex) downTo 0) {
+                    if (lines[i].matches(BANNED_REGEX)) {
+                        headCutLine = i + 1
+                        break
+                    }
+                }
+                val filteredLines = lines.drop(headCutLine)
+
+                var tailCutLine = 0
+                for (i in min(lines.size - HEAD_CUT_LIMIT, lines.lastIndex) downTo 0) {
+                    if (lines[lines.lastIndex - i].matches(BANNED_REGEX)) {
+                        tailCutLine = i + 1
+                        break
+                    }
+                }
+                val finalLines = filteredLines.dropLast(tailCutLine)
+
+                finalLines.takeIf {
+                    it.isNotEmpty() && "纯音乐，请欣赏" !in it[0]
+                }?.let NormalizedLines@ { nonEmptyLines ->
+                    val firstLine = nonEmptyLines.firstOrNull()?.toSimplifiedChinese() ?: return@NormalizedLines nonEmptyLines
+                    val (title, artist) = keyword
+                    if (title.toSimplifiedChinese() in firstLine ||
+                        artist.split("、").any { it.toSimplifiedChinese() in firstLine }
+                    ) {
+                        nonEmptyLines.drop(1)
+                    } else nonEmptyLines
+                }?.joinToString(separator = "\n")?.let {
+                    if (useTraditionalChinese) it.normalizeForTraditionalChinese()
+                    else it
                 }
             }
-            it.drop(headCutLine)
-        }.let {
-            var tailCutLine = 0
-            for (i in min(it.size - 30, it.lastIndex) downTo 0) {
-                if (it[it.lastIndex - i] matches BANNED_REGEX) {
-                    tailCutLine = i + 1
-                    break
-                }
-            }
-            it.dropLast(tailCutLine)
-        }.takeIf {
-            it.isNotEmpty() && "纯音乐，请欣赏" !in it[0]
-        }?.let { lines ->
-            val firstLine = lines.firstOrNull()?.toSimplifiedChinese() ?: return@let lines
-            val (title, artist) = keyword
-            if (title.toSimplifiedChinese() in firstLine ||
-                artist.split("、").any { it.toSimplifiedChinese() in firstLine }
-            ) {
-                lines.drop(1)
-            } else lines
-        }?.joinToString(separator = "\n")?.let {
-            if (useTraditionalChinese) it.normalizeForTraditionalChinese()
-            else it
+
+    private fun String.normalizeForTraditionalChinese(): String =
+        if (none { c -> UnicodeScript.of(c.code) in JapaneseUnicodeScript }) {
+            toTraditionalChinese()
+                .replace('着', '著')
+                .replace('羣', '群')
+        } else {
+            this
         }
-
-    private fun String.normalizeForTraditionalChinese() =
-        if (none { c -> UnicodeScript.of(c.code) in JapaneseUnicodeScript }) toTraditionalChinese()
-            .replace('着', '著')
-            .replace('羣', '群')
-        else this
 
     private fun String.toSimplifiedChinese() = ZhConverterUtil.toSimple(this)
     private fun String.toTraditionalChinese() = ZhConverterUtil.toTraditional(this)
