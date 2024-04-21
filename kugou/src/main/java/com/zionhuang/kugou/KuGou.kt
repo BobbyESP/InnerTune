@@ -16,7 +16,6 @@ import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.decodeBase64String
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import java.lang.Character.UnicodeScript
 import java.lang.Integer.min
 import kotlin.math.abs
 
@@ -74,7 +73,7 @@ object KuGou {
         }
         searchLyricsByKeyword(keyword, duration).candidates.forEach { candidate ->
             downloadLyrics(candidate.id, candidate.accesskey).content.decodeBase64String()
-                .normalize(keyword)?.let(callback)
+                .normalize(keyword).let(callback)
         }
     }
 
@@ -147,7 +146,7 @@ object KuGou {
     fun generateKeyword(title: String, artist: String) =
         Keyword(normalizeTitle(title), normalizeArtist(artist))
 
-    private fun String.normalize(keyword: Keyword): String? =
+    private fun String.normalize(keyword: Keyword): String =
         replace("&apos;", "'").lines().filter { line -> line.matches(ACCEPTED_REGEX) }
             .let { lines ->
                 // Remove useless information such as singer, writer, composer, guitar, etc.
