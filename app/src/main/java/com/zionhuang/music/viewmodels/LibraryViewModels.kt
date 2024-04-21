@@ -8,7 +8,27 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.exoplayer.offline.Download
 import com.zionhuang.innertube.YouTube
-import com.zionhuang.music.constants.*
+import com.zionhuang.music.constants.AlbumFilter
+import com.zionhuang.music.constants.AlbumFilterKey
+import com.zionhuang.music.constants.AlbumSortDescendingKey
+import com.zionhuang.music.constants.AlbumSortType
+import com.zionhuang.music.constants.AlbumSortTypeKey
+import com.zionhuang.music.constants.ArtistFilter
+import com.zionhuang.music.constants.ArtistFilterKey
+import com.zionhuang.music.constants.ArtistSongSortDescendingKey
+import com.zionhuang.music.constants.ArtistSongSortType
+import com.zionhuang.music.constants.ArtistSongSortTypeKey
+import com.zionhuang.music.constants.ArtistSortDescendingKey
+import com.zionhuang.music.constants.ArtistSortType
+import com.zionhuang.music.constants.ArtistSortTypeKey
+import com.zionhuang.music.constants.PlaylistSortDescendingKey
+import com.zionhuang.music.constants.PlaylistSortType
+import com.zionhuang.music.constants.PlaylistSortTypeKey
+import com.zionhuang.music.constants.SongFilter
+import com.zionhuang.music.constants.SongFilterKey
+import com.zionhuang.music.constants.SongSortDescendingKey
+import com.zionhuang.music.constants.SongSortType
+import com.zionhuang.music.constants.SongSortTypeKey
 import com.zionhuang.music.db.MusicDatabase
 import com.zionhuang.music.extensions.reversed
 import com.zionhuang.music.extensions.toEnum
@@ -19,7 +39,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.LocalDateTime
@@ -54,7 +79,10 @@ class LibrarySongsViewModel @Inject constructor(
                         }
                         .map { songs ->
                             when (sortType) {
-                                SongSortType.CREATE_DATE -> songs.sortedBy { downloads[it.id]?.updateTimeMs ?: 0L }
+                                SongSortType.CREATE_DATE -> songs.sortedBy {
+                                    downloads[it.id]?.updateTimeMs ?: 0L
+                                }
+
                                 SongSortType.NAME -> songs.sortedBy { it.song.title }
                                 SongSortType.ARTIST -> songs.sortedBy { song ->
                                     song.artists.joinToString(separator = "") { it.name }
@@ -96,7 +124,10 @@ class LibraryArtistsViewModel @Inject constructor(
                 artists
                     .map { it.artist }
                     .filter {
-                        it.thumbnailUrl == null || Duration.between(it.lastUpdateTime, LocalDateTime.now()) > Duration.ofDays(10)
+                        it.thumbnailUrl == null || Duration.between(
+                            it.lastUpdateTime,
+                            LocalDateTime.now()
+                        ) > Duration.ofDays(10)
                     }
                     .forEach { artist ->
                         YouTube.artist(artist.id).onSuccess { artistPage ->
@@ -163,7 +194,8 @@ class LibraryPlaylistsViewModel @Inject constructor(
 ) : ViewModel() {
     val allPlaylists = context.dataStore.data
         .map {
-            it[PlaylistSortTypeKey].toEnum(PlaylistSortType.CREATE_DATE) to (it[PlaylistSortDescendingKey] ?: true)
+            it[PlaylistSortTypeKey].toEnum(PlaylistSortType.CREATE_DATE) to (it[PlaylistSortDescendingKey]
+                ?: true)
         }
         .distinctUntilChanged()
         .flatMapLatest { (sortType, descending) ->
@@ -184,7 +216,8 @@ class ArtistSongsViewModel @Inject constructor(
 
     val songs = context.dataStore.data
         .map {
-            it[ArtistSongSortTypeKey].toEnum(ArtistSongSortType.CREATE_DATE) to (it[ArtistSongSortDescendingKey] ?: true)
+            it[ArtistSongSortTypeKey].toEnum(ArtistSongSortType.CREATE_DATE) to (it[ArtistSongSortDescendingKey]
+                ?: true)
         }
         .distinctUntilChanged()
         .flatMapLatest { (sortType, descending) ->

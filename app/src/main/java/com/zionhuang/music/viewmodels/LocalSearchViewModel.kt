@@ -3,10 +3,20 @@ package com.zionhuang.music.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zionhuang.music.db.MusicDatabase
-import com.zionhuang.music.db.entities.*
+import com.zionhuang.music.db.entities.Album
+import com.zionhuang.music.db.entities.Artist
+import com.zionhuang.music.db.entities.LocalItem
+import com.zionhuang.music.db.entities.Playlist
+import com.zionhuang.music.db.entities.Song
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -32,6 +42,7 @@ class LocalSearchViewModel @Inject constructor(
                 ) { songs, albums, artists, playlists ->
                     songs + albums + artists + playlists
                 }
+
                 LocalFilter.SONG -> database.searchSongs(query)
                 LocalFilter.ALBUM -> database.searchAlbums(query)
                 LocalFilter.ARTIST -> database.searchArtists(query)
@@ -50,7 +61,11 @@ class LocalSearchViewModel @Inject constructor(
                     })
             }
         }
-    }.stateIn(viewModelScope, SharingStarted.Lazily, LocalSearchResult("", filter.value, emptyMap()))
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Lazily,
+        LocalSearchResult("", filter.value, emptyMap())
+    )
 
     companion object {
         const val PREVIEW_SIZE = 3

@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.OfflinePin
 import androidx.compose.material3.Button
@@ -178,9 +177,10 @@ fun AlbumScreen(
                                 }
                             }
                             ClickableText(annotatedString) { offset ->
-                                annotatedString.getStringAnnotations(offset, offset).firstOrNull()?.let { range ->
-                                    navController.navigate("artist/${range.tag}")
-                                }
+                                annotatedString.getStringAnnotations(offset, offset).firstOrNull()
+                                    ?.let { range ->
+                                        navController.navigate("artist/${range.tag}")
+                                    }
                             }
 
                             if (ensuredAlbum.album.year != null) {
@@ -251,7 +251,10 @@ fun AlbumScreen(
                                         IconButton(
                                             onClick = {
                                                 ensuredAlbum.songs.forEach { song ->
-                                                    val downloadRequest = DownloadRequest.Builder(song.id, song.id.toUri())
+                                                    val downloadRequest = DownloadRequest.Builder(
+                                                        song.id,
+                                                        song.id.toUri()
+                                                    )
                                                         .setCustomCacheKey(song.id)
                                                         .setData(song.song.title.toByteArray())
                                                         .build()
@@ -276,7 +279,10 @@ fun AlbumScreen(
                                     onClick = {
                                         menuState.show {
                                             AlbumMenu(
-                                                originalAlbum = Album(ensuredAlbum.album, ensuredAlbum.artists),
+                                                originalAlbum = Album(
+                                                    ensuredAlbum.album,
+                                                    ensuredAlbum.artists
+                                                ),
                                                 navController = navController,
                                                 onDismiss = menuState::dismiss
                                             )

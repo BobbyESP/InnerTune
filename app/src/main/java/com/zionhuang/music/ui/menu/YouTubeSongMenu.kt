@@ -21,9 +21,6 @@ import androidx.compose.material.icons.rounded.Album
 import androidx.compose.material.icons.rounded.LibraryAdd
 import androidx.compose.material.icons.rounded.LibraryAddCheck
 import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material.icons.rounded.PlaylistAdd
-import androidx.compose.material.icons.rounded.PlaylistPlay
-import androidx.compose.material.icons.rounded.QueueMusic
 import androidx.compose.material.icons.rounded.Radio
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.Divider
@@ -215,7 +212,12 @@ fun YouTubeSongMenu(
             icon = Icons.Rounded.Radio,
             title = R.string.start_radio
         ) {
-            playerConnection.playQueue(YouTubeQueue(WatchEndpoint(videoId = song.id), song.toMediaMetadata()))
+            playerConnection.playQueue(
+                YouTubeQueue(
+                    WatchEndpoint(videoId = song.id),
+                    song.toMediaMetadata()
+                )
+            )
             onDismiss()
         }
         GridMenuItem(

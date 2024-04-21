@@ -23,7 +23,12 @@ object TranslationHelper {
         val isSynced = lyrics.lyrics.startsWith("[")
         val sourceLanguage = TranslateLanguage.fromLanguageTag(
             LanguageIdentification.getClient().identifyLanguage(
-                lyrics.lyrics.lines().joinToString(separator = "\n") { it.replace("\\[\\d{2}:\\d{2}.\\d{2,3}\\] *".toRegex(), "") }
+                lyrics.lyrics.lines().joinToString(separator = "\n") {
+                    it.replace(
+                        "\\[\\d{2}:\\d{2}.\\d{2,3}\\] *".toRegex(),
+                        ""
+                    )
+                }
             ).await()
         )
         val targetLanguage = TranslateLanguage.fromLanguageTag(
@@ -43,7 +48,8 @@ object TranslationHelper {
                     .requireWifi()
                     .build()
             ).await()
-            val traditionalChinese = Locale.getDefault().toLanguageTag().replace("-Hant", "") == "zh-TW"
+            val traditionalChinese =
+                Locale.getDefault().toLanguageTag().replace("-Hant", "") == "zh-TW"
             lyrics.copy(
                 lyrics = if (isSynced) {
                     LyricsUtils.parseLyrics(lyrics.lyrics).map {
@@ -52,7 +58,11 @@ object TranslationHelper {
                             text = if (traditionalChinese) ZhConverterUtil.toTraditional(translated) else translated
                         )
                     }.joinToString(separator = "\n") {
-                        "[%02d:%02d.%03d]${it.text}".format(it.time / 60000, (it.time / 1000) % 60, it.time % 1000)
+                        "[%02d:%02d.%03d]${it.text}".format(
+                            it.time / 60000,
+                            (it.time / 1000) % 60,
+                            it.time % 1000
+                        )
                     }
                 } else {
                     lyrics.lyrics.lines()
@@ -70,7 +80,8 @@ object TranslationHelper {
 
     suspend fun clearModels() {
         val modelManager = RemoteModelManager.getInstance()
-        val downloadedModels = modelManager.getDownloadedModels(TranslateRemoteModel::class.java).await()
+        val downloadedModels =
+            modelManager.getDownloadedModels(TranslateRemoteModel::class.java).await()
         downloadedModels.forEach {
             modelManager.deleteDownloadedModel(it).await()
         }

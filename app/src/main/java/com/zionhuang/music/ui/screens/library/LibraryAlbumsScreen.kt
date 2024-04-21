@@ -16,10 +16,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.List
 import androidx.compose.material.icons.rounded.GridView
-import androidx.compose.material.icons.rounded.List
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,7 +30,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -41,7 +38,16 @@ import androidx.navigation.NavController
 import com.zionhuang.music.LocalPlayerAwareWindowInsets
 import com.zionhuang.music.LocalPlayerConnection
 import com.zionhuang.music.R
-import com.zionhuang.music.constants.*
+import com.zionhuang.music.constants.AlbumFilter
+import com.zionhuang.music.constants.AlbumFilterKey
+import com.zionhuang.music.constants.AlbumSortDescendingKey
+import com.zionhuang.music.constants.AlbumSortType
+import com.zionhuang.music.constants.AlbumSortTypeKey
+import com.zionhuang.music.constants.AlbumViewTypeKey
+import com.zionhuang.music.constants.CONTENT_TYPE_ALBUM
+import com.zionhuang.music.constants.CONTENT_TYPE_HEADER
+import com.zionhuang.music.constants.GridThumbnailHeight
+import com.zionhuang.music.constants.LibraryViewType
 import com.zionhuang.music.ui.component.AlbumGridItem
 import com.zionhuang.music.ui.component.AlbumListItem
 import com.zionhuang.music.ui.component.ChipsRow
@@ -65,7 +71,10 @@ fun LibraryAlbumsScreen(
 
     var filter by rememberEnumPreference(AlbumFilterKey, AlbumFilter.LIBRARY)
     var viewType by rememberEnumPreference(AlbumViewTypeKey, LibraryViewType.GRID)
-    val (sortType, onSortTypeChange) = rememberEnumPreference(AlbumSortTypeKey, AlbumSortType.CREATE_DATE)
+    val (sortType, onSortTypeChange) = rememberEnumPreference(
+        AlbumSortTypeKey,
+        AlbumSortType.CREATE_DATE
+    )
     val (sortDescending, onSortDescendingChange) = rememberPreference(AlbumSortDescendingKey, true)
 
     val albums by viewModel.allAlbums.collectAsState()
@@ -92,10 +101,10 @@ fun LibraryAlbumsScreen(
             ) {
                 Icon(
                     imageVector =
-                        when (viewType) {
-                            LibraryViewType.LIST -> Icons.AutoMirrored.Rounded.List
-                            LibraryViewType.GRID -> Icons.Rounded.GridView
-                        },
+                    when (viewType) {
+                        LibraryViewType.LIST -> Icons.AutoMirrored.Rounded.List
+                        LibraryViewType.GRID -> Icons.Rounded.GridView
+                    },
                     contentDescription = null
                 )
             }

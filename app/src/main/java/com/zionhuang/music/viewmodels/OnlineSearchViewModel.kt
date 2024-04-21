@@ -43,7 +43,10 @@ class OnlineSearchViewModel @Inject constructor(
                     if (viewStateMap[filter.value] == null) {
                         YouTube.search(query, filter)
                             .onSuccess { result ->
-                                viewStateMap[filter.value] = ItemsPage(result.items.distinctBy { it.id }, result.continuation)
+                                viewStateMap[filter.value] = ItemsPage(
+                                    result.items.distinctBy { it.id },
+                                    result.continuation
+                                )
                             }
                             .onFailure {
                                 reportException(it)
@@ -61,8 +64,12 @@ class OnlineSearchViewModel @Inject constructor(
             val viewState = viewStateMap[filter] ?: return@launch
             val continuation = viewState.continuation
             if (continuation != null) {
-                val searchResult = YouTube.searchContinuation(continuation).getOrNull() ?: return@launch
-                viewStateMap[filter] = ItemsPage((viewState.items + searchResult.items).distinctBy { it.id }, searchResult.continuation)
+                val searchResult =
+                    YouTube.searchContinuation(continuation).getOrNull() ?: return@launch
+                viewStateMap[filter] = ItemsPage(
+                    (viewState.items + searchResult.items).distinctBy { it.id },
+                    searchResult.continuation
+                )
             }
         }
     }

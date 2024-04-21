@@ -569,7 +569,8 @@ interface DatabaseDao {
     fun insert(mediaMetadata: MediaMetadata, block: (SongEntity) -> SongEntity = { it }) {
         if (insert(mediaMetadata.toSongEntity().let(block)) == -1L) return
         mediaMetadata.artists.forEachIndexed { index, artist ->
-            val artistId = artist.id ?: artistByName(artist.name)?.id ?: ArtistEntity.generateArtistId()
+            val artistId =
+                artist.id ?: artistByName(artist.name)?.id ?: ArtistEntity.generateArtistId()
             insert(
                 ArtistEntity(
                     id = artistId,
@@ -610,7 +611,8 @@ interface DatabaseDao {
         albumPage.album.artists
             ?.map { artist ->
                 ArtistEntity(
-                    id = artist.id ?: artistByName(artist.name)?.id ?: ArtistEntity.generateArtistId(),
+                    id = artist.id ?: artistByName(artist.name)?.id
+                    ?: ArtistEntity.generateArtistId(),
                     name = artist.name
                 )
             }
@@ -675,7 +677,8 @@ interface DatabaseDao {
         albumPage.album.artists
             ?.map { artist ->
                 ArtistEntity(
-                    id = artist.id ?: artistByName(artist.name)?.id ?: ArtistEntity.generateArtistId(),
+                    id = artist.id ?: artistByName(artist.name)?.id
+                    ?: ArtistEntity.generateArtistId(),
                     name = artist.name
                 )
             }

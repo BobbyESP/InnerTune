@@ -89,7 +89,8 @@ class YouTubeTest {
     fun `Check 'browse' endpoint`() = runBlocking {
         var artist = youTube.artist("UCI6B8NkZKqlFWoiC_xE-hzA").getOrThrow()
         assertTrue(artist.sections.isNotEmpty())
-        artist = youTube.artist("UCy2RKLxIOMOfGld_yBYEBLw").getOrThrow() // Artist that contains audiobook
+        artist = youTube.artist("UCy2RKLxIOMOfGld_yBYEBLw")
+            .getOrThrow() // Artist that contains audiobook
         assertTrue(artist.sections.isNotEmpty())
         val album = youTube.album("MPREb_oNAdr9eUOfS").getOrThrow()
         assertTrue(album.songs.isNotEmpty())
@@ -99,9 +100,19 @@ class YouTubeTest {
 
     @Test
     fun `Check 'next' endpoint`() = runBlocking {
-        var nextResult = youTube.next(WatchEndpoint(videoId = "qivRUhepWVA", playlistId = "RDEMQWAKLFUHzBCn9nEsPHDYAw")).getOrThrow()
+        var nextResult = youTube.next(
+            WatchEndpoint(
+                videoId = "qivRUhepWVA",
+                playlistId = "RDEMQWAKLFUHzBCn9nEsPHDYAw"
+            )
+        ).getOrThrow()
         assertTrue(nextResult.items.isNotEmpty())
-        nextResult = youTube.next(WatchEndpoint(videoId = "jF4KKOsoyDs", playlistId = "PLaHh1PiehjvqOXm1J7b2QGy2iAvN84Azb")).getOrThrow()
+        nextResult = youTube.next(
+            WatchEndpoint(
+                videoId = "jF4KKOsoyDs",
+                playlistId = "PLaHh1PiehjvqOXm1J7b2QGy2iAvN84Azb"
+            )
+        ).getOrThrow()
         assertTrue(nextResult.items.isNotEmpty())
     }
 
@@ -159,7 +170,8 @@ class YouTubeTest {
 
     @Test
     fun related() = runBlocking {
-        val relatedEndpoint = YouTube.next(WatchEndpoint(videoId = "Z6ji6kls_OA")).getOrThrow().relatedEndpoint!!
+        val relatedEndpoint =
+            YouTube.next(WatchEndpoint(videoId = "Z6ji6kls_OA")).getOrThrow().relatedEndpoint!!
         val relatedPage = YouTube.related(relatedEndpoint).getOrThrow()
         assertTrue(relatedPage.songs.isNotEmpty())
     }

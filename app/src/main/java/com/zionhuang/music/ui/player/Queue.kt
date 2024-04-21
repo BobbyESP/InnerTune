@@ -37,7 +37,6 @@ import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Lyrics
 import androidx.compose.material.icons.rounded.MoreHoriz
-import androidx.compose.material.icons.rounded.QueueMusic
 import androidx.compose.material.icons.rounded.Shuffle
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material3.AlertDialog
@@ -48,7 +47,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
-import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
@@ -131,7 +129,10 @@ fun Queue(
 
     var showLyrics by rememberPreference(ShowLyricsKey, defaultValue = false)
 
-    val sleepTimerEnabled = remember(playerConnection.service.sleepTimer.triggerTime, playerConnection.service.sleepTimer.pauseWhenSongEnd) {
+    val sleepTimerEnabled = remember(
+        playerConnection.service.sleepTimer.triggerTime,
+        playerConnection.service.sleepTimer.pauseWhenSongEnd
+    ) {
         playerConnection.service.sleepTimer.isActive
     }
 
@@ -185,7 +186,11 @@ fun Queue(
             text = {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = pluralStringResource(R.plurals.minute, sleepTimerValue.roundToInt(), sleepTimerValue.roundToInt()),
+                        text = pluralStringResource(
+                            R.plurals.minute,
+                            sleepTimerValue.roundToInt(),
+                            sleepTimerValue.roundToInt()
+                        ),
                         style = MaterialTheme.typography.bodyLarge
                     )
 
@@ -247,7 +252,12 @@ fun Queue(
                         stringResource(R.string.sample_rate) to currentFormat?.sampleRate?.let { "$it Hz" },
                         stringResource(R.string.loudness) to currentFormat?.loudnessDb?.let { "$it dB" },
                         stringResource(R.string.volume) to "${(playerConnection.player.volume * 100).toInt()}%",
-                        stringResource(R.string.file_size) to currentFormat?.contentLength?.let { Formatter.formatShortFileSize(context, it) }
+                        stringResource(R.string.file_size) to currentFormat?.contentLength?.let {
+                            Formatter.formatShortFileSize(
+                                context,
+                                it
+                            )
+                        }
                     ).forEach { (label, text) ->
                         val displayText = text ?: stringResource(R.string.unknown)
                         Text(
@@ -262,7 +272,8 @@ fun Queue(
                                 indication = null,
                                 onClick = {
                                     clipboardManager.setText(AnnotatedString(displayText))
-                                    Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT)
+                                        .show()
                                 }
                             )
                         )
@@ -368,7 +379,8 @@ fun Queue(
                 } else {
                     playerConnection.player.setShuffleOrder(
                         DefaultShuffleOrder(
-                            queueWindows.map { it.firstPeriodIndex }.toMutableList().move(fromIndex, toIndex).toIntArray(),
+                            queueWindows.map { it.firstPeriodIndex }.toMutableList()
+                                .move(fromIndex, toIndex).toIntArray(),
                             System.currentTimeMillis()
                         )
                     )
@@ -416,10 +428,12 @@ fun Queue(
                                     playerConnection.player.removeMediaItem(currentItem.firstPeriodIndex)
                                     return@rememberSwipeToDismissBoxState true
                                 }
+
                                 SwipeToDismissBoxValue.EndToStart -> {
                                     playerConnection.player.removeMediaItem(currentItem.firstPeriodIndex)
                                     return@rememberSwipeToDismissBoxState true
                                 }
+
                                 SwipeToDismissBoxValue.Settled -> {
                                     return@rememberSwipeToDismissBoxState false
                                 }
@@ -497,7 +511,11 @@ fun Queue(
                     horizontalAlignment = Alignment.End
                 ) {
                     Text(
-                        text = pluralStringResource(R.plurals.n_song, queueWindows.size, queueWindows.size),
+                        text = pluralStringResource(
+                            R.plurals.n_song,
+                            queueWindows.size,
+                            queueWindows.size
+                        ),
                         style = MaterialTheme.typography.bodyMedium
                     )
 
@@ -539,7 +557,8 @@ fun Queue(
                             if (playerConnection.player.shuffleModeEnabled) playerConnection.player.currentMediaItemIndex else 0
                         )
                     }.invokeOnCompletion {
-                        playerConnection.player.shuffleModeEnabled = !playerConnection.player.shuffleModeEnabled
+                        playerConnection.player.shuffleModeEnabled =
+                            !playerConnection.player.shuffleModeEnabled
                     }
                 }
             ) {

@@ -258,7 +258,8 @@ fun SongListItem(
             )
         }
         if (showDownloadIcon) {
-            val download by LocalDownloadUtil.current.getDownload(song.id).collectAsState(initial = null)
+            val download by LocalDownloadUtil.current.getDownload(song.id)
+                .collectAsState(initial = null)
             when (download?.state) {
                 STATE_COMPLETED -> Icon(
                     imageVector = Icons.Rounded.OfflinePin,
@@ -322,7 +323,9 @@ fun SongListItem(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
-                        color = if (albumIndex != null) Color.Transparent else Color.Black.copy(alpha = 0.4f),
+                        color = if (albumIndex != null) Color.Transparent else Color.Black.copy(
+                            alpha = 0.4f
+                        ),
                         shape = RoundedCornerShape(ThumbnailCornerRadius)
                     )
             )
@@ -493,11 +496,12 @@ fun AlbumListItem(
             onState = { state ->
                 if (album.album.themeColor == null && state is AsyncImagePainter.State.Success) {
                     coroutineScope.launch(Dispatchers.IO) {
-                        state.result.drawable.toBitmapOrNull()?.extractThemeColor()?.toArgb()?.let { color ->
-                            database.query {
-                                update(album.album.copy(themeColor = color))
+                        state.result.drawable.toBitmapOrNull()?.extractThemeColor()?.toArgb()
+                            ?.let { color ->
+                                database.query {
+                                    update(album.album.copy(themeColor = color))
+                                }
                             }
-                        }
                     }
                 }
             },
@@ -898,7 +902,11 @@ fun YouTubeListItem(
 ) = ListItem(
     title = item.title,
     subtitle = when (item) {
-        is SongItem -> joinByBullet(item.artists.joinToString { it.name }, makeTimeString(item.duration?.times(1000L)))
+        is SongItem -> joinByBullet(
+            item.artists.joinToString { it.name },
+            makeTimeString(item.duration?.times(1000L))
+        )
+
         is AlbumItem -> joinByBullet(item.artists?.joinToString { it.name }, item.year?.toString())
         is ArtistItem -> null
         is PlaylistItem -> joinByBullet(item.author?.name, item.songCountText)
@@ -909,7 +917,8 @@ fun YouTubeListItem(
             contentAlignment = Alignment.Center,
             modifier = Modifier.size(ListThumbnailSize)
         ) {
-            val thumbnailShape = if (item is ArtistItem) CircleShape else RoundedCornerShape(ThumbnailCornerRadius)
+            val thumbnailShape =
+                if (item is ArtistItem) CircleShape else RoundedCornerShape(ThumbnailCornerRadius)
             if (albumIndex != null) {
                 AnimatedVisibility(
                     visible = !isActive,
@@ -938,7 +947,9 @@ fun YouTubeListItem(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
-                        color = if (albumIndex != null) Color.Transparent else Color.Black.copy(alpha = 0.4f),
+                        color = if (albumIndex != null) Color.Transparent else Color.Black.copy(
+                            alpha = 0.4f
+                        ),
                         shape = thumbnailShape
                     )
             )
@@ -1014,7 +1025,8 @@ fun YouTubeGridItem(
     isPlaying: Boolean = false,
     fillMaxWidth: Boolean = false,
 ) {
-    val thumbnailShape = if (item is ArtistItem) CircleShape else RoundedCornerShape(ThumbnailCornerRadius)
+    val thumbnailShape =
+        if (item is ArtistItem) CircleShape else RoundedCornerShape(ThumbnailCornerRadius)
     val thumbnailRatio = if (item is SongItem) 16f / 9 else 1f
 
     Column(
@@ -1146,8 +1158,16 @@ fun YouTubeGridItem(
             badges()
 
             val subtitle = when (item) {
-                is SongItem -> joinByBullet(item.artists.joinToString { it.name }, makeTimeString(item.duration?.times(1000L)))
-                is AlbumItem -> joinByBullet(item.artists?.joinToString { it.name }, item.year?.toString())
+                is SongItem -> joinByBullet(
+                    item.artists.joinToString { it.name },
+                    makeTimeString(item.duration?.times(1000L))
+                )
+
+                is AlbumItem -> joinByBullet(
+                    item.artists?.joinToString { it.name },
+                    item.year?.toString()
+                )
+
                 is ArtistItem -> null
                 is PlaylistItem -> joinByBullet(item.author?.name, item.songCountText)
             }

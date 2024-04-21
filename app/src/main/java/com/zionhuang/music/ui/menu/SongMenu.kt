@@ -19,8 +19,6 @@ import androidx.compose.material.icons.automirrored.rounded.PlaylistPlay
 import androidx.compose.material.icons.rounded.Album
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material.icons.rounded.PlaylistAdd
-import androidx.compose.material.icons.rounded.PlaylistPlay
 import androidx.compose.material.icons.rounded.Radio
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.Divider
@@ -85,7 +83,8 @@ fun SongMenu(
     val playerConnection = LocalPlayerConnection.current ?: return
     val songState = database.song(originalSong.id).collectAsState(initial = originalSong)
     val song = songState.value ?: originalSong
-    val download by LocalDownloadUtil.current.getDownload(originalSong.id).collectAsState(initial = null)
+    val download by LocalDownloadUtil.current.getDownload(originalSong.id)
+        .collectAsState(initial = null)
 
     var showEditDialog by rememberSaveable {
         mutableStateOf(false)
@@ -96,7 +95,10 @@ fun SongMenu(
             icon = { Icon(imageVector = Icons.Rounded.Edit, contentDescription = null) },
             title = { Text(text = stringResource(R.string.edit_song)) },
             onDismiss = { showEditDialog = false },
-            initialTextFieldValue = TextFieldValue(song.song.title, TextRange(song.song.title.length)),
+            initialTextFieldValue = TextFieldValue(
+                song.song.title,
+                TextRange(song.song.title.length)
+            ),
             onDone = { title ->
                 onDismiss()
                 database.query {
@@ -211,7 +213,12 @@ fun SongMenu(
             title = R.string.start_radio
         ) {
             onDismiss()
-            playerConnection.playQueue(YouTubeQueue(WatchEndpoint(videoId = song.id), song.toMediaMetadata()))
+            playerConnection.playQueue(
+                YouTubeQueue(
+                    WatchEndpoint(videoId = song.id),
+                    song.toMediaMetadata()
+                )
+            )
         }
         GridMenuItem(
             icon = Icons.AutoMirrored.Rounded.PlaylistPlay,

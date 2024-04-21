@@ -83,7 +83,8 @@ fun ArtistMenu(
             ) {
                 coroutineScope.launch {
                     val songs = withContext(Dispatchers.IO) {
-                        database.artistSongs(artist.id, ArtistSongSortType.CREATE_DATE, true).first()
+                        database.artistSongs(artist.id, ArtistSongSortType.CREATE_DATE, true)
+                            .first()
                             .map { it.toMediaItem() }
                     }
                     playerConnection.playQueue(
@@ -101,7 +102,8 @@ fun ArtistMenu(
             ) {
                 coroutineScope.launch {
                     val songs = withContext(Dispatchers.IO) {
-                        database.artistSongs(artist.id, ArtistSongSortType.CREATE_DATE, true).first()
+                        database.artistSongs(artist.id, ArtistSongSortType.CREATE_DATE, true)
+                            .first()
                             .map { it.toMediaItem() }
                             .shuffled()
                     }

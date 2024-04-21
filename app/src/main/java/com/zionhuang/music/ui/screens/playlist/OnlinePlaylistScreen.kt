@@ -23,8 +23,6 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.Input
-import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Input
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Radio
 import androidx.compose.material.icons.rounded.Shuffle
@@ -50,7 +48,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -171,7 +168,8 @@ fun OnlinePlaylistScreen(
                                             }
                                         }
                                         ClickableText(annotatedString) { offset ->
-                                            annotatedString.getStringAnnotations(offset, offset).firstOrNull()?.let { range ->
+                                            annotatedString.getStringAnnotations(offset, offset)
+                                                .firstOrNull()?.let { range ->
                                                 navController.navigate("artist/${range.tag}")
                                             }
                                         }
@@ -205,7 +203,11 @@ fun OnlinePlaylistScreen(
                                                         }
                                                         .forEach(::insert)
                                                     coroutineScope.launch {
-                                                        snackbarHostState.showSnackbar(context.getString(R.string.playlist_imported))
+                                                        snackbarHostState.showSnackbar(
+                                                            context.getString(
+                                                                R.string.playlist_imported
+                                                            )
+                                                        )
                                                     }
                                                 }
                                             }
@@ -307,7 +309,12 @@ fun OnlinePlaylistScreen(
                                     if (song.id == mediaMetadata?.id) {
                                         playerConnection.player.togglePlayPause()
                                     } else {
-                                        playerConnection.playQueue(YouTubeQueue(song.endpoint ?: WatchEndpoint(videoId = song.id), song.toMediaMetadata()))
+                                        playerConnection.playQueue(
+                                            YouTubeQueue(
+                                                song.endpoint ?: WatchEndpoint(videoId = song.id),
+                                                song.toMediaMetadata()
+                                            )
+                                        )
                                     }
                                 }
                                 .animateItemPlacement()
