@@ -10,16 +10,10 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
-if (isFullBuild && System.getenv("PULL_REQUEST") == null) {
-    apply(plugin = "com.google.gms.google-services")
-    apply(plugin = "com.google.firebase.crashlytics")
-    apply(plugin = "com.google.firebase.firebase-perf")
-}
-
 android {
     namespace = "com.zionhuang.music"
     compileSdk = 34
-    buildToolsVersion = "30.0.3"
+
     defaultConfig {
         applicationId = "com.zionhuang.music"
         minSdk = 21
