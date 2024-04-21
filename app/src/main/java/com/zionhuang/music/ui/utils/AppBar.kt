@@ -31,7 +31,7 @@ fun appBarScrollBehavior(
     )
 
 @ExperimentalMaterial3Api
-class AppBarScrollBehavior constructor(
+class AppBarScrollBehavior(
     override val state: TopAppBarState,
     override val snapAnimationSpec: AnimationSpec<Float>?,
     override val flingAnimationSpec: DecayAnimationSpec<Float>?,
@@ -53,7 +53,7 @@ class AppBarScrollBehavior constructor(
                     state.contentOffset = 0f
                 }
             }
-            state.heightOffset += consumed.y
+            state.heightOffset = (state.heightOffset + consumed.y).coerceAtLeast(0f)
             return Offset.Zero
         }
     }

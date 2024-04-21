@@ -376,10 +376,7 @@ class MainActivity : ComponentActivity() {
                     LaunchedEffect(navBackStackEntry) {
                         if (navBackStackEntry?.destination?.route?.startsWith("search/") == true) {
                             val searchQuery = withContext(Dispatchers.IO) {
-                                URLDecoder.decode(
-                                    navBackStackEntry?.arguments?.getString("query")!!,
-                                    "UTF-8"
-                                )
+                                URLDecoder.decode(navBackStackEntry?.arguments?.getString("query")!!, "UTF-8")
                             }
                             onQueryChange(
                                 TextFieldValue(
@@ -879,7 +876,7 @@ class MainActivity : ComponentActivity() {
                         )
 
                         sharedSong?.let { song ->
-                            playerConnection?.let { playerConnection ->
+                            playerConnection?.let { _ ->
                                 Dialog(
                                     onDismissRequest = { sharedSong = null },
                                     properties = DialogProperties(usePlatformDefaultWidth = false)
