@@ -11,6 +11,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
+import androidx.compose.material.icons.automirrored.rounded.PlaylistPlay
+import androidx.compose.material.icons.rounded.PlaylistAdd
+import androidx.compose.material.icons.rounded.PlaylistPlay
+import androidx.compose.material.icons.rounded.Radio
+import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -205,14 +212,14 @@ fun YouTubeAlbumMenu(
         )
     ) {
         GridMenuItem(
-            icon = R.drawable.radio,
+            icon = Icons.Rounded.Radio,
             title = R.string.start_radio
         ) {
             playerConnection.playQueue(YouTubeAlbumRadio(albumItem.playlistId))
             onDismiss()
         }
         GridMenuItem(
-            icon = R.drawable.playlist_play,
+            icon = Icons.AutoMirrored.Rounded.PlaylistPlay,
             title = R.string.play_next
         ) {
             album?.songs
@@ -230,7 +237,7 @@ fun YouTubeAlbumMenu(
             onDismiss()
         }
         GridMenuItem(
-            icon = R.drawable.playlist_add,
+            icon = Icons.AutoMirrored.Rounded.PlaylistAdd,
             title = R.string.add_to_playlist
         ) {
             showChoosePlaylistDialog = true
@@ -276,7 +283,7 @@ fun YouTubeAlbumMenu(
             }
         }
         GridMenuItem(
-            icon = R.drawable.share,
+            icon = Icons.Rounded.Share,
             title = R.string.share
         ) {
             val intent = Intent().apply {

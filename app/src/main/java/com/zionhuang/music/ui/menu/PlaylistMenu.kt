@@ -5,6 +5,10 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Sync
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -106,7 +110,7 @@ fun PlaylistMenu(
 
     if (showEditDialog) {
         TextFieldDialog(
-            icon = { Icon(painter = painterResource(R.drawable.edit), contentDescription = null) },
+            icon = { Icon(imageVector = Icons.Rounded.Edit, contentDescription = null) },
             title = { Text(text = stringResource(R.string.edit_playlist)) },
             onDismiss = { showEditDialog = false },
             initialTextFieldValue = TextFieldValue(
@@ -256,7 +260,7 @@ fun PlaylistMenu(
         }
 
         GridMenuItem(
-            icon = R.drawable.edit,
+            icon = Icons.Rounded.Edit,
             title = R.string.edit
         ) {
             showEditDialog = true
@@ -284,7 +288,7 @@ fun PlaylistMenu(
         )
 
         GridMenuItem(
-            icon = R.drawable.delete,
+            icon = Icons.Rounded.Delete,
             title = R.string.delete
         ) {
             showDeletePlaylistDialog = true
@@ -292,7 +296,7 @@ fun PlaylistMenu(
 
         if (playlist.playlist.browseId != null) {
             GridMenuItem(
-                icon = R.drawable.sync,
+                icon = Icons.Rounded.Sync,
                 title = R.string.sync
             ) {
                 onDismiss()

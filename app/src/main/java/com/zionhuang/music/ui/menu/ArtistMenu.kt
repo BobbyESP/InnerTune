@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material.icons.rounded.Shuffle
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -93,7 +96,7 @@ fun ArtistMenu(
                 onDismiss()
             }
             GridMenuItem(
-                icon = R.drawable.shuffle,
+                icon = Icons.Rounded.Shuffle,
                 title = R.string.shuffle
             ) {
                 coroutineScope.launch {
@@ -114,7 +117,7 @@ fun ArtistMenu(
         }
         if (artist.artist.isYouTubeArtist) {
             GridMenuItem(
-                icon = R.drawable.share,
+                icon = Icons.Rounded.Share,
                 title = R.string.share
             ) {
                 onDismiss()

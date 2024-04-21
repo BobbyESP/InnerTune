@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -138,28 +140,10 @@ fun AboutScreen(
 
         Row {
             IconButton(
-                onClick = { uriHandler.openUri("https://github.com/z-huang/InnerTune") }
+                onClick = { uriHandler.openUri("https://github.com/BobbyESP/InnerTune") }
             ) {
                 Icon(
                     painter = painterResource(R.drawable.github),
-                    contentDescription = null
-                )
-            }
-
-            IconButton(
-                onClick = { uriHandler.openUri("https://liberapay.com/zionhuang") }
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.liberapay),
-                    contentDescription = null
-                )
-            }
-
-            IconButton(
-                onClick = { uriHandler.openUri("https://www.buymeacoffee.com/zionhuang") }
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.buymeacoffee),
                     contentDescription = null
                 )
             }
@@ -175,7 +159,7 @@ fun AboutScreen(
                 onLongClick = navController::backToMain
             ) {
                 Icon(
-                    painterResource(R.drawable.arrow_back),
+                    Icons.AutoMirrored.Rounded.ArrowBack,
                     contentDescription = null
                 )
             }

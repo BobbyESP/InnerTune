@@ -4,6 +4,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Language
+import androidx.compose.material.icons.rounded.Palette
+import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Restore
+import androidx.compose.material.icons.rounded.Security
+import androidx.compose.material.icons.rounded.Storage
+import androidx.compose.material.icons.rounded.Update
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,37 +51,37 @@ fun SettingsScreen(
     ) {
         PreferenceEntry(
             title = { Text(stringResource(R.string.appearance)) },
-            icon = { Icon(painterResource(R.drawable.palette), null) },
+            icon = { Icon(Icons.Rounded.Palette, null) },
             onClick = { navController.navigate("settings/appearance") }
         )
         PreferenceEntry(
             title = { Text(stringResource(R.string.content)) },
-            icon = { Icon(painterResource(R.drawable.language), null) },
+            icon = { Icon(Icons.Rounded.Language, null) },
             onClick = { navController.navigate("settings/content") }
         )
         PreferenceEntry(
             title = { Text(stringResource(R.string.player_and_audio)) },
-            icon = { Icon(painterResource(R.drawable.play), null) },
+            icon = { Icon(Icons.Rounded.PlayArrow, null) },
             onClick = { navController.navigate("settings/player") }
         )
         PreferenceEntry(
             title = { Text(stringResource(R.string.storage)) },
-            icon = { Icon(painterResource(R.drawable.storage), null) },
+            icon = { Icon(Icons.Rounded.Storage, null) },
             onClick = { navController.navigate("settings/storage") }
         )
         PreferenceEntry(
             title = { Text(stringResource(R.string.privacy)) },
-            icon = { Icon(painterResource(R.drawable.security), null) },
+            icon = { Icon(Icons.Rounded.Security, null) },
             onClick = { navController.navigate("settings/privacy") }
         )
         PreferenceEntry(
             title = { Text(stringResource(R.string.backup_restore)) },
-            icon = { Icon(painterResource(R.drawable.restore), null) },
+            icon = { Icon(Icons.Rounded.Restore, null) },
             onClick = { navController.navigate("settings/backup_restore") }
         )
         PreferenceEntry(
             title = { Text(stringResource(R.string.about)) },
-            icon = { Icon(painterResource(R.drawable.info), null) },
+            icon = { Icon(Icons.Rounded.Info, null) },
             onClick = { navController.navigate("settings/about") }
         )
         if (latestVersion > BuildConfig.VERSION_CODE) {
@@ -84,11 +95,11 @@ fun SettingsScreen(
                     BadgedBox(
                         badge = { Badge() }
                     ) {
-                        Icon(painterResource(R.drawable.update), null)
+                        Icon(Icons.Rounded.Update, null)
                     }
                 },
                 onClick = {
-                    uriHandler.openUri("https://github.com/z-huang/InnerTune/releases/latest")
+                    uriHandler.openUri("https://github.com/BobbyESP/InnerTune/releases/latest")
                 }
             )
         }
@@ -102,7 +113,7 @@ fun SettingsScreen(
                 onLongClick = navController::backToMain
             ) {
                 Icon(
-                    painterResource(R.drawable.arrow_back),
+                    Icons.AutoMirrored.Rounded.ArrowBack,
                     contentDescription = null
                 )
             }
