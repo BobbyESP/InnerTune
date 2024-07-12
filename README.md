@@ -1,7 +1,8 @@
+# ⚠️ WARNING: REPO ARCHIVED - VISIT [Malopieds/InnerTune](https://github.com/Malopieds/InnerTune)
+This repository was archived due to my lack of time for maintenance. The one mentioned above has a lot of work already done with new features that you will love. If I have time I will collaborate on it!
+
 # InnerTune
-
 <img src="https://raw.githubusercontent.com/z-huang/InnerTune/dev/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp" height="72">
-
 A Material 3 YouTube Music client for Android
 
 [![Latest release](https://img.shields.io/github/v/release/z-huang/InnerTune?include_prereleases)](https://github.com/z-huang/music/releases)
